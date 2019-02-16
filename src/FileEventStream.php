@@ -43,7 +43,7 @@ class FileEventStream implements EventStorable, EventTraversable
         return $this;
     }
 
-    public function append($event)
+    public function append(Event $event)
     {
         $this->data[] = $event;
     }

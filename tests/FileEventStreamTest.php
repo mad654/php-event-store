@@ -36,7 +36,7 @@ class FileEventStreamTest extends FileTestCase
     public function sut_always_persistsAddedEvents()
     {
         $expected = $this->instance();
-        $expected->append("");
+        $expected->append(new TestEvent());
 
         $actual = $this->instance()->load();
 
