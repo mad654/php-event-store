@@ -10,8 +10,16 @@ use Traversable;
 /**
  * Class FileEventStream
  *
- * Can store/load/traverse events stored in filesystem ordered
- * ascending by timestamp
+ * Can store/load/traverse events stored in filesystem
+ * in the order they were attached originally
+ *
+ * It's import to know for a system in which order events
+ * arrived. The timestamp of creation is "only" a part
+ * of the domain knowledge and may be useful for merging
+ * conflicting events or not.
+ *
+ * The order of events arrival at the store will give us
+ * the reason, why this conflict occurred and make it repeatable.
  *
  * @package mad654\eventstore
  */
