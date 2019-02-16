@@ -115,7 +115,7 @@ class FileEventStream implements EventStorable, Logable
     }
 
 
-    public function attachLogger(LoggerInterface $logger)
+    public function attachLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
