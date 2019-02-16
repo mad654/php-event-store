@@ -88,14 +88,14 @@ class FileEventStream implements EventStorable, Logable
 
             $this->logger->debug("found `$serialized` in `$this->filePath`");
 
-            yield unserialize($serialized);
+            yield $this->deserialized($serialized);
         }
     }
 
     public function attach(Event $event): EventStorable
     {
         $this->flock(LOCK_EX);
-        $serialized = serialize($event);
+        $serialized = $this->serialize($event);
         $newLine = "$serialized" . self::DELIMITER;
         fwrite($this->fileHandle, $newLine);
         fflush($this->fileHandle);
@@ -124,5 +124,23 @@ class FileEventStream implements EventStorable, Logable
         if ($result === false) {
             throw new \RuntimeException("Could change lock to method: $lockMethod");
         }
+    }
+
+    public function serialize(Event $event): string
+    {
+        return serialize($event);
+    }
+
+    public function deserialized(string $serialized): Event
+    {
+        $obj = unserialize($serialized);
+
+        if ($obj instanceof Event) {
+            return $obj;
+        }
+
+        throw new \RuntimeException(
+            "Expected object which implements Event but got " . get_class($obj)
+        );
     }
 }
