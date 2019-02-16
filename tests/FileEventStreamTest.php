@@ -41,18 +41,6 @@ class FileEventStreamTest extends FileTestCase
     /**
      * @test
      */
-    public function getIterator_twoElement_returnsIteratorWithTwoElements()
-    {
-        $actual = $this->instance()
-            ->append(new TestEvent('one'))
-            ->append(new TestEvent('two'));
-
-        $this->assertCount(2, iterator_to_array($actual->getIterator()));
-    }
-
-    /**
-     * @test
-     */
     public function getIterator_always_returnsEvents()
     {
         $actual = $this->instance()
@@ -64,6 +52,23 @@ class FileEventStreamTest extends FileTestCase
             $this->assertInstanceOf(Event::class, $item);
         }
     }
+
+    /**
+     * @test
+     */
+    public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
+    {
+        $actual = $this->instance()
+            ->append(new TestEvent('one'))
+            ->append(new TestEvent('two'));
+
+        $actual = iterator_to_array($actual->getIterator());
+
+        $this->assertCount(2, $actual);
+        $this->assertEquals(new TestEvent("one"), $actual[0]);
+        $this->assertEquals(new TestEvent("two"), $actual[1]);
+    }
+
     /**
      * @test
      */
