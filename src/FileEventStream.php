@@ -64,7 +64,6 @@ class FileEventStream implements EventStorable, Logable
         $this->name = $name;
         $this->logger = new NullLogger();
 
-        // TODO fetch return type and raise exception if false (lock not possible)
         $this->flock(LOCK_SH);
         $this->logger->debug("opened `$this->filePath`");
     }
@@ -113,7 +112,6 @@ class FileEventStream implements EventStorable, Logable
         fclose($this->fileHandle);
         $this->logger->debug("closed `$this->filePath`");
     }
-
 
     public function attachLogger(LoggerInterface $logger): void
     {
