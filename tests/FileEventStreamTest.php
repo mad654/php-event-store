@@ -88,6 +88,4 @@ class FileEventStreamTest extends FileTestCase
             iterator_to_array($actual->getIterator())
         );
     }
-
-    // TODO assert events ordered ascending by timestamp even if they were attached in different order
 }
