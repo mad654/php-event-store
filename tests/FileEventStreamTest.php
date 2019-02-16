@@ -44,7 +44,7 @@ class FileEventStreamTest extends FileTestCase
     public function getIterator_always_returnsEvents()
     {
         $actual = $this->instance()
-            ->append(new TestEvent('one'));
+            ->attach(new TestEvent('one'));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -59,8 +59,8 @@ class FileEventStreamTest extends FileTestCase
     public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
     {
         $actual = $this->instance()
-            ->append(new TestEvent('one'))
-            ->append(new TestEvent('two'));
+            ->attach(new TestEvent('one'))
+            ->attach(new TestEvent('two'));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -75,11 +75,11 @@ class FileEventStreamTest extends FileTestCase
     public function sut_always_persistsAddedEvents()
     {
         $expected = $this->instance();
-        $expected->append(new TestEvent("one"));
+        $expected->attach(new TestEvent("one"));
         unset($expected);
 
         $expected = $this->instance();
-        $expected->append(new TestEvent("two"));
+        $expected->attach(new TestEvent("two"));
 
         $actual = $this->instance();
 

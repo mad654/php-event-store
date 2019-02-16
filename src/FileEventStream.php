@@ -13,17 +13,10 @@ use Traversable;
  * Can store/load/traverse events stored in filesystem
  * in the order they were attached originally
  *
- * It's import to know for a system in which order events
- * arrived. The timestamp of creation is "only" a part
- * of the domain knowledge and may be useful for merging
- * conflicting events or not.
- *
- * The order of events arrival at the store will give us
- * the reason, why this conflict occurred and make it repeatable.
- *
+ * @see EventStorable
  * @package mad654\eventstore
  */
-class FileEventStream implements EventStorable, EventTraversable, Logable
+class FileEventStream implements EventStorable, Logable
 {
     const DELIMITER = '###\n';
 
@@ -71,7 +64,7 @@ class FileEventStream implements EventStorable, EventTraversable, Logable
         $this->name = $name;
         $this->logger = new NullLogger();
 
-        $this->logger->debug("opened $this->filePath");
+        $this->logger->debug("opened `$this->filePath`");
     }
 
     /**
@@ -88,22 +81,22 @@ class FileEventStream implements EventStorable, EventTraversable, Logable
 
         foreach (explode(self::DELIMITER, $content) as $serialized) {
             if (empty($serialized)) {
-                $this->logger->debug("found empty line in $this->filePath ... will break");
+                $this->logger->debug("found empty line in `$this->filePath` ... will break");
                 break;
             }
 
-            $this->logger->debug("found $serialized in $this->filePath");
+            $this->logger->debug("found `$serialized` in `$this->filePath`");
 
             yield unserialize($serialized);
         }
     }
 
-    public function append(Event $event): self
+    public function attach(Event $event): EventStorable
     {
         $serialized = serialize($event);
         $newLine = "$serialized" . self::DELIMITER;
         fwrite($this->fileHandle, $newLine);
-        $this->logger->debug("attached $newLine to $this->filePath");
+        $this->logger->debug("attached event as `$newLine` to `$this->filePath`");
 
         return $this;
     }
@@ -111,7 +104,7 @@ class FileEventStream implements EventStorable, EventTraversable, Logable
     public function __destruct()
     {
         fclose($this->fileHandle);
-        $this->logger->debug("closed $this->filePath");
+        $this->logger->debug("closed `$this->filePath`");
     }
 
 
