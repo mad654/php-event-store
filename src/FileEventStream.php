@@ -10,7 +10,8 @@ use Traversable;
 /**
  * Class FileEventStream
  *
- * Can store/load/traverse over events stored in filesystem
+ * Can store/load/traverse events stored in filesystem ordered
+ * ascending by timestamp
  *
  * @package mad654\eventstore
  */
