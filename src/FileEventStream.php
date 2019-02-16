@@ -65,7 +65,7 @@ class FileEventStream implements EventStorable, Logable
         $this->logger = new NullLogger();
 
         // TODO fetch return type and raise exception if false (lock not possible)
-        flock($this->fileHandle, LOCK_SH);
+        $this->flock(LOCK_SH);
         $this->logger->debug("opened `$this->filePath`");
     }
 
@@ -95,13 +95,12 @@ class FileEventStream implements EventStorable, Logable
 
     public function attach(Event $event): EventStorable
     {
-        // TODO fetch return type and raise exception if false (lock not possible)
-        flock($this->fileHandle, LOCK_EX);
+        $this->flock(LOCK_EX);
         $serialized = serialize($event);
         $newLine = "$serialized" . self::DELIMITER;
         fwrite($this->fileHandle, $newLine);
         fflush($this->fileHandle);
-        flock($this->fileHandle, LOCK_SH);
+        $this->flock(LOCK_SH);
 
         $this->logger->debug("attached event as `$newLine` to `$this->filePath`");
 
@@ -110,8 +109,7 @@ class FileEventStream implements EventStorable, Logable
 
     public function __destruct()
     {
-        // TODO fetch return type and raise exception if false (unlock not possible)
-        flock($this->fileHandle, LOCK_UN);
+        $this->flock(LOCK_UN);
         fclose($this->fileHandle);
         $this->logger->debug("closed `$this->filePath`");
     }
@@ -120,5 +118,13 @@ class FileEventStream implements EventStorable, Logable
     public function attachLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    private function flock(int $lockMethod): void
+    {
+        $result = flock($this->fileHandle, $lockMethod);
+        if ($result === false) {
+            throw new \RuntimeException("Could change lock to method: $lockMethod");
+        }
     }
 }
