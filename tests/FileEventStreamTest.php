@@ -8,8 +8,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class FileEventStreamTest extends FileTestCase
 {
-    # const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_DEBUG;
-    const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_NORMAL;
+    const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_DEBUG;
+    # const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_NORMAL;
 
     /**
      * @param string $name
@@ -44,8 +44,8 @@ class FileEventStreamTest extends FileTestCase
     public function getIterator_twoElement_returnsIteratorWithTwoElements()
     {
         $actual = $this->instance()
-            ->append(new TestEvent())
-            ->append(new TestEvent());
+            ->append(new TestEvent('one'))
+            ->append(new TestEvent('two'));
 
         $this->assertCount(2, iterator_to_array($actual->getIterator()));
     }
@@ -53,14 +53,28 @@ class FileEventStreamTest extends FileTestCase
     /**
      * @test
      */
+    public function getIterator_always_returnsEvents()
+    {
+        $actual = $this->instance()
+            ->append(new TestEvent('one'));
+
+        $actual = iterator_to_array($actual->getIterator());
+
+        foreach ($actual as $item) {
+            $this->assertInstanceOf(Event::class, $item);
+        }
+    }
+    /**
+     * @test
+     */
     public function sut_always_persistsAddedEvents()
     {
         $expected = $this->instance();
-        $expected->append(new TestEvent());
+        $expected->append(new TestEvent("one"));
         unset($expected);
 
         $expected = $this->instance();
-        $expected->append(new TestEvent());
+        $expected->append(new TestEvent("two"));
 
         $actual = $this->instance();
 

@@ -84,13 +84,16 @@ class FileEventStream implements EventStorable, EventTraversable, Logable
             }
 
             $this->logger->debug("found $serialized in $this->filePath");
-            yield unserialize($serialized);
+
+            // TODO: get rid of hardcoded class here
+            // TODO: serialize / deserialize is strange implemented: fix it
+            yield TestEvent::deserialize($serialized);
         }
     }
 
     public function append(Event $event): self
     {
-        $serialized = serialize($event);
+        $serialized = $event->serialize();
         $newLine = "$serialized" . self::DELIMITER;
         fwrite($this->fileHandle, $newLine);
         $this->logger->debug("attached $newLine to $this->filePath");
