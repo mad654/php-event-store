@@ -8,8 +8,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class FileEventStreamTest extends FileTestCase
 {
-    const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_DEBUG;
-    # const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_NORMAL;
+    # const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_DEBUG;
+    const ConsoleLogVerbosity = ConsoleOutput::VERBOSITY_NORMAL;
 
     /**
      * @param string $name
@@ -88,4 +88,6 @@ class FileEventStreamTest extends FileTestCase
             iterator_to_array($actual->getIterator())
         );
     }
+
+    // TODO assert events ordered ascending by timestamp even if they were attached in different order
 }
