@@ -148,6 +148,7 @@ class FileEventStream implements EventStream, Logable
 
     public function appendUnknown(EventStream $other): void
     {
+        # TODO: make sure we only import unknown events
         foreach ($other as $event) {
             $this->append($event);
         }
