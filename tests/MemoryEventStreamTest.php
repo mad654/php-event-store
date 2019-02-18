@@ -12,7 +12,7 @@ class MemoryEventStreamTest extends TestCase
      */
     public function __construct_always_isEventStorable()
     {
-        $this->assertInstanceOf(EventStorable::class, $this->instance());
+        $this->assertInstanceOf(EventStream::class, $this->instance());
     }
 
     public function instance(): MemoryEventStream
@@ -26,7 +26,7 @@ class MemoryEventStreamTest extends TestCase
     public function getIterator_always_returnsEvents()
     {
         $actual = $this->instance()
-            ->attach(new TestEvent('one'));
+            ->append(new TestEvent('one'));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -41,8 +41,8 @@ class MemoryEventStreamTest extends TestCase
     public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
     {
         $actual = $this->instance()
-            ->attach(new TestEvent('one'))
-            ->attach(new TestEvent('two'));
+            ->append(new TestEvent('one'))
+            ->append(new TestEvent('two'));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -57,11 +57,11 @@ class MemoryEventStreamTest extends TestCase
     public function importFrom_bothOneElement_hasTwoElements()
     {
         $stream1 = $this->instance();
-        $stream1->attach(new TestEvent('one'));
+        $stream1->append(new TestEvent('one'));
         $stream2 = $this->instance();
-        $stream2->attach(new TestEvent('two'));
+        $stream2->append(new TestEvent('two'));
 
-        $stream1->ensureAllKnown($stream2);
+        $stream1->appendUnknown($stream2);
 
         $this->assertCount(2, iterator_to_array($stream1->getIterator()));
     }

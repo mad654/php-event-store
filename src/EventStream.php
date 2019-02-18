@@ -4,7 +4,7 @@ namespace mad654\eventstore;
 
 
 /**
- * Interface EventStorable
+ * Interface EventStream
  * @package mad654\eventstore
  *
  * Can store/load/traverse events
@@ -18,9 +18,22 @@ namespace mad654\eventstore;
  * The order of events arrival at the store will give us
  * the reason, why this conflict occurred and make it repeatable.
  */
-interface EventStorable extends EventTraversable
+interface EventStream extends EventTraversable
 {
-    public function attach(Event $event): EventStorable;
+    /**
+     *
+     * append single event to the end of this stream
+     *
+     * @param Event $event
+     * @return EventStream
+     */
+    public function append(Event $event): EventStream;
 
-    public function ensureAllKnown(EventStorable $other): void;
+    /**
+     *
+     * append all unknown events to the end of this stream
+     *
+     * @param EventStream $other
+     */
+    public function appendUnknown(EventStream $other): void;
 }

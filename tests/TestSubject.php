@@ -11,7 +11,7 @@ class TestSubject implements EventStreamEmitter
     private $id;
 
     /**
-     * @var EventStorable
+     * @var EventStream
      */
     private $events;
 
@@ -19,7 +19,7 @@ class TestSubject implements EventStreamEmitter
     {
         $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->attach(new TestEvent($id));
+        $this->events->append(new TestEvent($id));
     }
 
     /**
@@ -31,7 +31,7 @@ class TestSubject implements EventStreamEmitter
     }
 
 
-    public function events(): EventStorable
+    public function events(): EventStream
     {
         return $this->events;
     }

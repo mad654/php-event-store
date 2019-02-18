@@ -5,5 +5,5 @@ namespace mad654\eventstore;
 
 interface EventStreamFactory
 {
-    public function new(string $id): EventStorable;
+    public function new(string $id): EventStream;
 }

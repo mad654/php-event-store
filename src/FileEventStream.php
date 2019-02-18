@@ -13,12 +13,12 @@ use Traversable;
  * Can store/load/traverse events stored in filesystem
  * in the order they were attached originally
  *
- * @see EventStorable
+ * @see EventStream
  * @package mad654\eventstore
  *
  * TODO Implement FileEventStreamFactory
  */
-class FileEventStream implements EventStorable, Logable
+class FileEventStream implements EventStream, Logable
 {
     const DELIMITER = '###\n';
 
@@ -94,7 +94,7 @@ class FileEventStream implements EventStorable, Logable
         }
     }
 
-    public function attach(Event $event): EventStorable
+    public function append(Event $event): EventStream
     {
         $this->flock(LOCK_EX);
         $serialized = $this->serialize($event);
@@ -146,10 +146,10 @@ class FileEventStream implements EventStorable, Logable
         );
     }
 
-    public function ensureAllKnown(EventStorable $other): void
+    public function appendUnknown(EventStream $other): void
     {
         foreach ($other as $event) {
-            $this->attach($event);
+            $this->append($event);
         }
     }
 }

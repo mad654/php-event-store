@@ -5,7 +5,7 @@ namespace mad654\eventstore;
 
 use Traversable;
 
-class MemoryEventStream implements EventStorable
+class MemoryEventStream implements EventStream
 {
     /**
      * @var array
@@ -32,17 +32,17 @@ class MemoryEventStream implements EventStorable
         return new \ArrayIterator($this->data);
     }
 
-    public function attach(Event $event): EventStorable
+    public function append(Event $event): EventStream
     {
         $this->data[] = $event;
 
         return $this;
     }
 
-    public function ensureAllKnown(EventStorable $other): void
+    public function appendUnknown(EventStream $other): void
     {
         foreach ($other as $event) {
-            $this->attach($event);
+            $this->append($event);
         }
     }
 }
