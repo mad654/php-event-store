@@ -7,7 +7,7 @@ test:
 	@echo "Unit tests:"
 	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit
 	@echo "Performance tests:"
-	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite performance
+	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite performance --testdox
 
 test.watch:
 	@watchexec -- vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit

@@ -3,7 +3,7 @@
 namespace mad654\eventstore;
 
 
-class PerformanceTestIntegration extends FileTestCase
+class FileEventStreamPerformanceTestIntegration extends FileTestCase
 {
     /**
      * @test
