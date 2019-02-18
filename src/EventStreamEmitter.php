@@ -7,6 +7,5 @@ interface EventStreamEmitter
 {
     public function subjectId(): string;
 
-    // TODO return EventStream
-    public function events(): array;
+    public function events(): EventStorable;
 }
