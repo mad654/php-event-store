@@ -52,6 +52,30 @@ class EventObjectStoreTest extends FileTestCase
     }
 
     /**
+     * @test
+     */
+    public function get_subjectIdKnown_returnsSameSubject()
+    {
+        $expected = new TestSubject('one');
+        $store = $this->instance();
+        $store->attach($expected);
+
+        $actual = $store->get('one');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Object with id `unknown` not found
+     */
+    public function get_subjectIdUnknown_throwsException()
+    {
+        $this->instance()->get('unknown');
+    }
+
+    /**
      * @return EventObjectStore
      */
     public function instance(): EventObjectStore

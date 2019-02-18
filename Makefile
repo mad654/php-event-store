@@ -4,7 +4,10 @@ usage:
 	@echo "  make test.watch - watch all test"
 
 test:
-	@vendor/bin/phpunit -c tests/phpunit.xml tests/
+	@echo "Unit tests:"
+	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit
+	@echo "Performance tests:"
+	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite performance
 
 test.watch:
-	@watchexec -- vendor/bin/phpunit -c tests/phpunit.xml tests/
+	@watchexec -- vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit

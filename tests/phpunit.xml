@@ -20,5 +20,15 @@
         timeoutForMediumTests="10"
         timeoutForLargeTests="60"
         verbose="false" >
-     
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory suffix="Test.php">.</directory>
+        </testsuite>
+
+        <testsuite name="performance">
+            <directory suffix="PerformanceTestIntegration.php">.</directory>
+        </testsuite>
+    </testsuites>
+
 </phpunit>
