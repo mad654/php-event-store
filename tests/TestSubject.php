@@ -22,17 +22,13 @@ class TestSubject implements EventStreamEmitter
         $this->events->append(new TestEvent($id));
     }
 
-    /**
-     * @return string
-     */
     public function subjectId(): string
     {
         return $this->id;
     }
 
-
-    public function events(): EventStream
+    public function emitEventsTo(EventStream $stream): void
     {
-        return $this->events;
+        $stream->appendUnknown($this->events);
     }
 }

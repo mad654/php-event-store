@@ -29,6 +29,6 @@ class EventObjectStore
     public function attach(EventStreamEmitter $emitter): void
     {
         $stream = $this->streamFactory->new($emitter->subjectId());
-        $stream->appendUnknown($emitter->events());
+        $emitter->emitEventsTo($stream);
     }
 }
