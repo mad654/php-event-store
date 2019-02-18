@@ -144,7 +144,7 @@ class FileEventStream implements EventStorable, Logable
         );
     }
 
-    public function importAll(EventStorable $other): void
+    public function ensureAllKnown(EventStorable $other): void
     {
         foreach ($other as $event) {
             $this->attach($event);

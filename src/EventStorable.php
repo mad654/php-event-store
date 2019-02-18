@@ -22,5 +22,5 @@ interface EventStorable extends EventTraversable
 {
     public function attach(Event $event): EventStorable;
 
-    public function importAll(EventStorable $other): void;
+    public function ensureAllKnown(EventStorable $other): void;
 }
