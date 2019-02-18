@@ -15,6 +15,8 @@ use Traversable;
  *
  * @see EventStorable
  * @package mad654\eventstore
+ *
+ * TODO Implement FileEventStreamFactory
  */
 class FileEventStream implements EventStorable, Logable
 {
