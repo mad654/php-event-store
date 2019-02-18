@@ -143,4 +143,11 @@ class FileEventStream implements EventStorable, Logable
             "Expected object which implements Event but got " . get_class($obj)
         );
     }
+
+    public function importAll(EventStorable $other): void
+    {
+        foreach ($other as $event) {
+            $this->attach($event);
+        }
+    }
 }

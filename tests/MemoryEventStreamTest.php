@@ -50,4 +50,19 @@ class MemoryEventStreamTest extends TestCase
         $this->assertEquals(new TestEvent("one"), $actual[0]);
         $this->assertEquals(new TestEvent("two"), $actual[1]);
     }
+
+    /**
+     * @test
+     */
+    public function importFrom_bothOneElement_hasTwoElements()
+    {
+        $stream1 = $this->instance();
+        $stream1->attach(new TestEvent('one'));
+        $stream2 = $this->instance();
+        $stream2->attach(new TestEvent('two'));
+
+        $stream1->importAll($stream2);
+
+        $this->assertCount(2, iterator_to_array($stream1->getIterator()));
+    }
 }

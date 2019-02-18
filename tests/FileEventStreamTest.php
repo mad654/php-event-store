@@ -72,6 +72,21 @@ class FileEventStreamTest extends FileTestCase
     /**
      * @test
      */
+    public function importFrom_bothOneElement_hasTwoElements()
+    {
+        $stream1 = $this->instance('one');
+        $stream1->attach(new TestEvent('one'));
+        $stream2 = $this->instance('two');
+        $stream2->attach(new TestEvent('two'));
+
+        $stream1->importAll($stream2);
+
+        $this->assertCount(2, iterator_to_array($stream1->getIterator()));
+    }
+
+    /**
+     * @test
+     */
     public function sut_always_persistsAddedEvents()
     {
         $expected = $this->instance();

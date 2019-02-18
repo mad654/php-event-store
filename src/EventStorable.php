@@ -21,4 +21,6 @@ namespace mad654\eventstore;
 interface EventStorable extends EventTraversable
 {
     public function attach(Event $event): EventStorable;
+
+    public function importAll(EventStorable $other): void;
 }

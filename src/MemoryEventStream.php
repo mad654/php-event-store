@@ -38,4 +38,11 @@ class MemoryEventStream implements EventStorable
 
         return $this;
     }
+
+    public function importAll(EventStorable $other): void
+    {
+        foreach ($other as $event) {
+            $this->attach($event);
+        }
+    }
 }
