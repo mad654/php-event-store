@@ -6,7 +6,7 @@ namespace mad654\eventstore;
 /**
  *
  * Persists objects by storing
- * there events
+ * their events
  *
  */
 class EventObjectStore
