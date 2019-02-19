@@ -38,7 +38,7 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
      */
     public function instance(): FileEventStream
     {
-        $stream = new FileEventStream(
+        $stream = FileEventStream::new(
             $this->rootDirPath(),
             'sut_singleFile1000Events_loadsIn100ms'
         );

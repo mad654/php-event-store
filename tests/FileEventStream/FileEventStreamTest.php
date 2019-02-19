@@ -22,7 +22,18 @@ class FileEventStreamTest extends FileTestCase
      */
     private function instance(string $name = "test_storage"): FileEventStream
     {
-        $fileEventStream = new FileEventStream($this->rootDirPath(), $name);
+        $fileEventStream = FileEventStream::new($this->rootDirPath(), $name);
+        $fileEventStream->attachLogger(new Logger(new ConsoleOutput(self::ConsoleLogVerbosity)));
+        return $fileEventStream;
+    }
+
+    /**
+     * @param string $name
+     * @return FileEventStream
+     */
+    private function loadInstance(string $name = "test_storage"): FileEventStream
+    {
+        $fileEventStream = FileEventStream::load($this->rootDirPath(), $name);
         $fileEventStream->attachLogger(new Logger(new ConsoleOutput(self::ConsoleLogVerbosity)));
         return $fileEventStream;
     }
@@ -98,10 +109,10 @@ class FileEventStreamTest extends FileTestCase
         $expected->append(new TestEvent("one"));
         unset($expected);
 
-        $expected = $this->instance();
+        $expected = $this->loadInstance();
         $expected->append(new TestEvent("two"));
 
-        $actual = $this->instance();
+        $actual = $this->loadInstance();
 
         $this->assertEquals(
             iterator_to_array($expected->getIterator()),

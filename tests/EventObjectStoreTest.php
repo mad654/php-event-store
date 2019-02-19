@@ -46,7 +46,7 @@ class EventObjectStoreTest extends FileTestCase
      */
     public function attach_always_fwdEventsToNewStream()
     {
-        $stream = new FileEventStream($this->rootDirPath(), 'some-subject-id');
+        $stream = FileEventStream::new($this->rootDirPath(), 'some-subject-id');
         $this->streamFactory
             ->method('new')
             ->willReturn($stream);
@@ -79,7 +79,7 @@ class EventObjectStoreTest extends FileTestCase
      */
     public function get_subjectIdUnknown_throwsException()
     {
-        $this->instance()->get('unknown');
+        $this->instance(new FileEventStreamFactory($this->rootDirPath()))->get('unknown');
     }
 
     public function instance(FileEventStreamFactory $factory = null): EventObjectStore

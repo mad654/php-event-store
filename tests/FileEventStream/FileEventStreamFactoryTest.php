@@ -45,6 +45,16 @@ class FileEventStreamFactoryTest extends FileTestCase
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Stream with id `unknown` not found
+     */
+    public function get_unknownId_throwsException()
+    {
+        $this->instance()->get('unknown');
+    }
+
     // TODO construct directory not exists, throws exception
     // TODO construct directory not writeable, throws exception
     // TODO new file exists throws exception

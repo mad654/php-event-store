@@ -23,7 +23,7 @@ use Traversable;
  *
  * TODO Error case: empty stream file
  */
-class FileEventStream implements EventStream, Logable
+final class FileEventStream implements EventStream, Logable
 {
     const DELIMITER = '###\n';
 
@@ -57,9 +57,9 @@ class FileEventStream implements EventStream, Logable
      * @param string $rootDirPath
      * @param string $name
      */
-    public function __construct(string $rootDirPath, string $name)
+    private function __construct(string $rootDirPath, string $name)
     {
-        $this->filePath = $rootDirPath . DIRECTORY_SEPARATOR . $name . ".dat";
+        $this->filePath = self::constructFilePath($rootDirPath, $name);
         $fh = fopen($this->filePath, 'a+');
 
         if ($fh === false) {
@@ -73,6 +73,33 @@ class FileEventStream implements EventStream, Logable
 
         $this->flock(LOCK_SH);
         $this->logger->debug("opened `$this->filePath`");
+    }
+
+    public static function new(string $rooDirPath, string $id): self
+    {
+        if (file_exists(self::constructFilePath($rooDirPath, $id))) {
+            throw new \RuntimeException(
+                "Stream with id `$id` already exists"
+            );
+        }
+
+        return new self($rooDirPath, $id);
+    }
+
+    public static function load(string $rooDirPath, string $id): self
+    {
+        if (!file_exists(self::constructFilePath($rooDirPath, $id))) {
+            throw new \RuntimeException(
+                "Stream with id `$id` not found"
+            );
+        }
+
+        return new self($rooDirPath, $id);
+    }
+
+    private static function constructFilePath(string $rootDirPath, string $name): string
+    {
+        return $rootDirPath . DIRECTORY_SEPARATOR . $name . ".dat";
     }
 
     /**

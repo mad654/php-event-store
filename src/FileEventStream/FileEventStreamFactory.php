@@ -27,7 +27,7 @@ class FileEventStreamFactory implements EventStreamFactory
 
     public function new(string $id): EventStream
     {
-        $stream = new FileEventStream($this->rooDirPath, $id);
+        $stream = FileEventStream::new($this->rooDirPath, $id);
         $this->knownStreams[$id] = $stream;
         return $stream;
     }
@@ -35,7 +35,7 @@ class FileEventStreamFactory implements EventStreamFactory
     public function get(string $id): EventStream
     {
         if (!array_key_exists($id, $this->knownStreams)) {
-            return new FileEventStream($this->rooDirPath, $id);
+            return FileEventStream::load($this->rooDirPath, $id);
         }
 
         return $this->knownStreams[$id];

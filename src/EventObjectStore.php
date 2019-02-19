@@ -9,7 +9,7 @@ use mad654\eventstore\EventStream\EventStreamFactory;
 /**
  *
  * Persists objects by storing
- * their events
+ * their events to given stream factory
  *
  */
 class EventObjectStore
@@ -20,17 +20,11 @@ class EventObjectStore
     private $streamFactory;
 
     /**
-     * @var EventStreamEmitter[]
-     */
-    private $objects;
-
-    /**
      * EventObjectStore constructor.
      * @param EventStreamFactory $streamFactory
      */
     public function __construct(EventStreamFactory $streamFactory)
     {
-        $this->objects = [];
         $this->streamFactory = $streamFactory;
     }
 
@@ -39,21 +33,19 @@ class EventObjectStore
     {
         $stream = $this->streamFactory->new($emitter->subjectId());
         $emitter->emitEventsTo($stream);
-        $this->objects[$emitter->subjectId()] = $emitter;
     }
 
     public function get(string $key): EventStreamEmitter
     {
-        $stream = $this->streamFactory->get($key);
-        # TODO: stream should not be returned here if it not exists
-        $this->objects[$key] = $stream->toEventStreamEmitter();
-
-        if (!array_key_exists($key, $this->objects)) {
+        try {
+            $stream = $this->streamFactory->get($key);
+            return $stream->toEventStreamEmitter();
+        } catch (\RuntimeException $e) {
             throw new \RuntimeException(
-                "Object with id `$key` not found"
+                "Object with id `$key` not found",
+                404,
+                $e
             );
         }
-
-        return $this->objects[$key];
     }
 }
