@@ -16,7 +16,7 @@ use Traversable;
  * @see EventStream
  * @package mad654\eventstore
  *
- * TODO Implement FileEventStreamFactory
+ * TODO Error case: empty stream file
  */
 class FileEventStream implements EventStream, Logable
 {
