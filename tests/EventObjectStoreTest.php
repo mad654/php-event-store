@@ -5,6 +5,7 @@ namespace mad654\eventstore;
 
 use mad654\eventstore\EventStream\EventStreamFactory;
 use mad654\eventstore\FileEventStream\FileEventStream;
+use mad654\eventstore\FileEventStream\FileEventStreamFactory;
 use mad654\eventstore\Fixtures\TestSubject;
 use mad654\eventstore\TestCase\FileTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,16 +59,18 @@ class EventObjectStoreTest extends FileTestCase
     /**
      * @test
      */
-    public function get_subjectIdKnown_returnsSameSubject()
+    public function get_subjectIdKnown_returnsEqualSubject()
     {
         $expected = new TestSubject('one');
-        $store = $this->instance();
+        $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
         $store->attach($expected);
 
         $actual = $store->get('one');
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
+
+    # TODO: reply not call constructor
 
     /**
      * @test
@@ -79,12 +82,13 @@ class EventObjectStoreTest extends FileTestCase
         $this->instance()->get('unknown');
     }
 
-    /**
-     * @return EventObjectStore
-     */
-    public function instance(): EventObjectStore
+    public function instance(FileEventStreamFactory $factory = null): EventObjectStore
     {
-        return new EventObjectStore($this->streamFactory);
+        if (is_null($factory)) {
+            $factory = $this->streamFactory;
+        }
+
+        return new EventObjectStore($factory);
     }
 
 }

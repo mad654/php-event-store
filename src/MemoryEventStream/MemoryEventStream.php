@@ -5,6 +5,8 @@ namespace mad654\eventstore\MemoryEventStream;
 
 use mad654\eventstore\Event;
 use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\EventStreamEmitter;
+use mad654\eventstore\Fixtures\TestSubject;
 use Traversable;
 
 class MemoryEventStream implements EventStream
@@ -47,5 +49,15 @@ class MemoryEventStream implements EventStream
         foreach ($other as $event) {
             $this->append($event);
         }
+    }
+
+    public function toEventStreamEmitter(): EventStreamEmitter
+    {
+        # TODO: refactor to common abstract base class?
+        # TODO: do not call constructor
+        # TODO: Load subject class from stream
+        $subject = new TestSubject("fake");
+        $subject->replay($this);
+        return $subject;
     }
 }

@@ -44,9 +44,13 @@ class EventObjectStore
 
     public function get(string $key): EventStreamEmitter
     {
+        $stream = $this->streamFactory->get($key);
+        # TODO: stream should not be returned here if it not exists
+        $this->objects[$key] = $stream->toEventStreamEmitter();
+
         if (!array_key_exists($key, $this->objects)) {
             throw new \RuntimeException(
-                'Object with id `unknown` not found'
+                "Object with id `$key` not found"
             );
         }
 

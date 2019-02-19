@@ -38,4 +38,6 @@ interface EventStream extends EventTraversable
      * @param EventStream $other
      */
     public function appendUnknown(EventStream $other): void;
+
+    public function toEventStreamEmitter(): EventStreamEmitter;
 }

@@ -9,5 +9,5 @@ namespace mad654\eventstore;
  */
 interface Event
 {
-
+    public function payload(): array;
 }

@@ -5,6 +5,8 @@ namespace mad654\eventstore\FileEventStream;
 
 use mad654\eventstore\Event;
 use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\EventStreamEmitter;
+use mad654\eventstore\Fixtures\TestSubject;
 use mad654\eventstore\Logable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -156,5 +158,15 @@ class FileEventStream implements EventStream, Logable
         foreach ($other as $event) {
             $this->append($event);
         }
+    }
+
+    public function toEventStreamEmitter(): EventStreamEmitter
+    {
+        # TODO: refactor to common abstract base class?
+        # TODO: do not call constructor
+        # TODO: Load subject class from stream
+        $subject = new TestSubject("replay_file");
+        $subject->replay($this);
+        return $subject;
     }
 }

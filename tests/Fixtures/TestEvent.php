@@ -20,4 +20,9 @@ class TestEvent implements Event
     {
         $this->payload = ['someEventField' => $someEventField];
     }
+
+    public function payload(): array
+    {
+        return $this->payload;
+    }
 }
