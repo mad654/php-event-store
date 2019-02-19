@@ -1,6 +1,6 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\EventStream;
 
 
 interface EventStreamFactory

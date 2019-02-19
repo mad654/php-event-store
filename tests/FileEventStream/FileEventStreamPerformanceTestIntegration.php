@@ -3,6 +3,10 @@
 namespace mad654\eventstore;
 
 
+use mad654\eventstore\FileEventStream\FileEventStream;
+use mad654\eventstore\Fixtures\TestEvent;
+use mad654\eventstore\TestCase\FileTestCase;
+
 class FileEventStreamPerformanceTestIntegration extends FileTestCase
 {
     /**

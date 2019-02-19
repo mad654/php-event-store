@@ -3,6 +3,10 @@
 namespace mad654\eventstore;
 
 
+use mad654\eventstore\EventStream\EventStreamFactory;
+use mad654\eventstore\FileEventStream\FileEventStream;
+use mad654\eventstore\Fixtures\TestSubject;
+use mad654\eventstore\TestCase\FileTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class EventObjectStoreTest extends FileTestCase

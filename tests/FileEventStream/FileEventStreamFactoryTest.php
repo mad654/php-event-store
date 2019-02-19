@@ -1,7 +1,11 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\FileEventStream;
 
+
+use mad654\eventstore\EventStream\EventStreamFactory;
+use mad654\eventstore\Fixtures\TestEvent;
+use mad654\eventstore\TestCase\FileTestCase;
 
 class FileEventStreamFactoryTest extends FileTestCase
 {

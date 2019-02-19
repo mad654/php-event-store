@@ -1,8 +1,10 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\MemoryEventStream;
 
 
+use mad654\eventstore\Event;
+use mad654\eventstore\EventStream\EventStream;
 use Traversable;
 
 class MemoryEventStream implements EventStream

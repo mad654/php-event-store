@@ -1,7 +1,10 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\FileEventStream;
 
+
+use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\EventStreamFactory;
 
 class FileEventStreamFactory implements EventStreamFactory
 {

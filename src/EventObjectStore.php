@@ -3,6 +3,9 @@
 namespace mad654\eventstore;
 
 
+use mad654\eventstore\EventStream\EventStreamEmitter;
+use mad654\eventstore\EventStream\EventStreamFactory;
+
 /**
  *
  * Persists objects by storing

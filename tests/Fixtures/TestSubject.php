@@ -1,7 +1,11 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\Fixtures;
 
+
+use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\EventStreamEmitter;
+use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 
 class TestSubject implements EventStreamEmitter
 {

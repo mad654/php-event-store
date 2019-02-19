@@ -1,9 +1,14 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\FileEventStream;
 
 
 use Consolidation\Log\Logger;
+use mad654\eventstore\Event;
+use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\EventTraversable;
+use mad654\eventstore\Fixtures\TestEvent;
+use mad654\eventstore\TestCase\FileTestCase;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class FileEventStreamTest extends FileTestCase

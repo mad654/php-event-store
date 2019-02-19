@@ -1,8 +1,11 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\MemoryEventStream;
 
 
+use mad654\eventstore\Event;
+use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\Fixtures\TestEvent;
 use PHPUnit\Framework\TestCase;
 
 class MemoryEventStreamTest extends TestCase

@@ -1,7 +1,9 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\Fixtures;
 
+
+use mad654\eventstore\Event;
 
 class TestEvent implements Event
 {

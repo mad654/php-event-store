@@ -1,8 +1,11 @@
 <?php
 
-namespace mad654\eventstore;
+namespace mad654\eventstore\FileEventStream;
 
 
+use mad654\eventstore\Event;
+use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\Logable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Traversable;
