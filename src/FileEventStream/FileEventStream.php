@@ -93,7 +93,7 @@ class FileEventStream implements EventStream, Logable
 
             $this->logger->debug("found `$serialized` in `$this->filePath`");
 
-            yield $this->deserialized($serialized);
+            yield $this->deserialize($serialized);
         }
     }
 
@@ -136,7 +136,7 @@ class FileEventStream implements EventStream, Logable
         return serialize($event);
     }
 
-    public function deserialized(string $serialized): Event
+    public function deserialize(string $serialized): Event
     {
         $obj = unserialize($serialized);
 
