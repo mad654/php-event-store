@@ -19,7 +19,6 @@ use Traversable;
  * @see EventStream
  * @package mad654\eventstore
  *
- * TODO Error case: empty stream file
  * TODO Refactor serialisation to json?
  */
 final class FileEventStream implements EventStream, Logable
@@ -110,8 +109,13 @@ final class FileEventStream implements EventStream, Logable
      */
     public function getIterator()
     {
+        $filesize = filesize($this->filePath);
+        if ($filesize === 0) {
+            return;
+        }
+
         fseek($this->fileHandle, 0);
-        $content = fread($this->fileHandle, filesize($this->filePath));
+        $content = fread($this->fileHandle, $filesize);
 
         foreach (explode(self::DELIMITER, $content) as $serialized) {
             if (empty($serialized)) {

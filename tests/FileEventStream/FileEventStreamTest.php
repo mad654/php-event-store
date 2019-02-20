@@ -41,7 +41,7 @@ class FileEventStreamTest extends FileTestCase
     /**
      * @test
      */
-    public function __construct_always_returnsEventStorable()
+    public function new_always_returnsEventStorable()
     {
         $this->assertInstanceOf(EventStream::class, $this->instance());
     }
@@ -49,7 +49,7 @@ class FileEventStreamTest extends FileTestCase
     /**
      * @test
      */
-    public function __construct_always_returnsEventTraversable()
+    public function new_always_returnsEventTraversable()
     {
         $this->assertInstanceOf(EventTraversable::class, $this->instance());
     }
@@ -83,6 +83,22 @@ class FileEventStreamTest extends FileTestCase
         $this->assertCount(2, $actual);
         $this->assertEquals(new TestEvent("one"), $actual[0]);
         $this->assertEquals(new TestEvent("two"), $actual[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function getIterator_emptyStream_doesNotThrowException()
+    {
+        FileEventStream::new($this->rootDirPath(), 'empty');
+
+        $acutal = FileEventStream::load($this->rootDirPath(), 'empty');
+
+        foreach ($acutal->getIterator() as $item) {
+            $this->fail("should not have any items but got: " . serialize($item));
+        }
+
+        $this->assertTrue(true);
     }
 
     /**
