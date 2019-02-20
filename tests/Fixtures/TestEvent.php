@@ -5,7 +5,7 @@ namespace mad654\eventstore\Fixtures;
 
 use mad654\eventstore\Event;
 
-# TODO: rename to GenericEvent
+# TODO: rename to StateChanged
 # TODO: support array of key => value pairs (tree)
 # TODO: support easy access to payload values with defaults (example: GenericEvent::value($key, $default = null)
 class TestEvent implements Event

@@ -101,27 +101,36 @@ class Lighter implements EventStreamEmitter
         $this->events->append(new GenericEvent($id));
     }
     
-    public function switchLightOn()
+    public function switchLightOn(): void
     {
         // do some stuff which does the hard work
-        $event = new GenericEvent(['light' => 'on']);
+        $this->record(new StateChanged(['light' => 'on']));
+    }
+    
+    public function switchLightOff(): void
+    {
+        // do some stuff which does the hard work
+        $this->record(new StateChanged(['light' => 'off']));
+    }
+    
+    private function record(Event $event): void
+    {
         $this->on($event);
         $this->events->append($event);
     }
     
-    public function switchLightOff()
+    private function on(Event $event)
     {
-        // do some stuff which does the hard work
-        $event = new GenericEvent(['light' => 'off']);
-        $this->on($event);
-        $this->events->append($event);
+        // if 'id' not defined in event, use current value
+        $this->id = $event->value('id', $this->id); 
+        $this->light = $event->value('light', $this->light);
     }
     
     public function subjectId(): string {
         return $this->id
     }
 
-    public function emitEventsTo(EventStream $stream) {
+    public function emitEventsTo(EventStream $stream): void {
         $stream->appendAll($this->events);
         $this->events = $stream;
     }
@@ -133,13 +142,6 @@ class Lighter implements EventStreamEmitter
         foreach ($stream->getIterator() as $event) {
             $this->on($event);
         }
-    }
-    
-    private function on(Event $event)
-    {
-        // if 'id' not defined in event, use current values as default
-        $this->id = $event->value('id', $this->id); 
-        $this->light = $event->value('light', $this->light);
     }
 }
 ```
