@@ -59,4 +59,9 @@ class TestSubject implements EventStreamEmitter
         $this->id = $event->payload()['someEventField'];
         $this->events->append($event);
     }
+
+    public function dummyEventAction($i)
+    {
+        $this->events->append(new TestEvent($i));
+    }
 }

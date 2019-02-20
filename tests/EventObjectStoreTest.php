@@ -92,8 +92,6 @@ class EventObjectStoreTest extends FileTestCase
         $this->assertEquals($expected, $actual);
     }
 
-    # TODO: reply not call constructor
-
     /**
      * @test
      * @expectedException \RuntimeException
