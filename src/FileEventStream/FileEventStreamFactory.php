@@ -21,9 +21,27 @@ class FileEventStreamFactory implements EventStreamFactory
 
     public function __construct(string $rootDirPath)
     {
+        $this->ensureRootDirectoryWillWork($rootDirPath);
+
+        $this->rooDirPath = $rootDirPath;
+        $this->knownStreams = [];
+    }
+
+    /**
+     * @param string $rootDirPath
+     */
+    private function ensureRootDirectoryWillWork(string $rootDirPath): void
+    {
         if (!file_exists($rootDirPath)) {
             throw new \RuntimeException(sprintf(
                 'Root directory not exists: ´%s´ - mount failed?',
+                $rootDirPath
+            ));
+        }
+
+        if (!is_dir($rootDirPath)) {
+            throw new \RuntimeException(sprintf(
+                'Root directory not a directory: ´%s´',
                 $rootDirPath
             ));
         }
@@ -34,9 +52,6 @@ class FileEventStreamFactory implements EventStreamFactory
                 $rootDirPath
             ));
         }
-
-        $this->rooDirPath = $rootDirPath;
-        $this->knownStreams = [];
     }
 
     public function new(string $id): EventStream

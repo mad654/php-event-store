@@ -51,7 +51,29 @@ class FileEventStreamFactoryTest extends FileTestCase
         $this->fail("Expected RuntimeException");
     }
 
-    // TODO construct directory not directory, throws exception
+    /**
+     * @test
+     */
+    public function construct_rootDirectoryNotADirectory_throwsException()
+    {
+        $rootDir = $this->rootDirPath() . DIRECTORY_SEPARATOR . 'file';
+        touch($rootDir);
+
+        try {
+            new FileEventStreamFactory($rootDir);
+        } catch (\RuntimeException $e) {
+            $this->assertStringStartsWith(
+                'Root directory not a directory: ´',
+                $e->getMessage()
+            );
+
+            return;
+        } finally {
+            chmod($rootDir, 0777);
+        }
+
+        $this->fail("Expected RuntimeException");
+    }
 
     public function instance(): FileEventStreamFactory
     {
