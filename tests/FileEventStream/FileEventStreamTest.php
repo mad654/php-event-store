@@ -130,9 +130,11 @@ class FileEventStreamTest extends FileTestCase
 
         $actual = $this->loadInstance();
 
-        $this->assertEquals(
-            iterator_to_array($expected->getIterator()),
-            iterator_to_array($actual->getIterator())
-        );
+        $expectedData = iterator_to_array($expected->getIterator());
+        $actualData = iterator_to_array($actual->getIterator());
+
+        $this->assertCount(2, $expectedData);
+        $this->assertCount(2, $actualData);
+        $this->assertEquals($expectedData, $actualData);
     }
 }
