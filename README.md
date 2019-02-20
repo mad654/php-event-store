@@ -35,6 +35,8 @@ wurde, werden alle aktuellen und alle neuen Events persistiert.
 Ob alle neuen Events persistiert werden, hängt von der Implementierung
 des Subjects ab.
 
+@TBD API die state changes über events super einfach macht
+
 ## motivation
 
 object relational mapping is hard, even its welcovered topic, you can only achive about 80% cases working: which?
@@ -135,13 +137,9 @@ class Lighter implements EventStreamEmitter
     
     private function on(Event $event)
     {
-        if (isset($event->payload()['id'])) {
-            $this->id = $event->payload()['someEventField'];
-        }
-        
-        if (isset($event->payload()['light'])) {
-            $this->id = $event->payload()['someEventField'];
-        }
+        // if 'id' not defined in event, use current values as default
+        $this->id = $event->value('id', $this->id); 
+        $this->light = $event->value('light', $this->light);
     }
 }
 ```
