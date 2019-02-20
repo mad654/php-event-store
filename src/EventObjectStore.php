@@ -53,24 +53,13 @@ class EventObjectStore
 
     private function toEventStreamEmitter(EventStream $stream): EventStreamEmitter
     {
-        $subjectType = $this->extractSubjectClassName($stream);
+        $class = $this->extractSubjectClassName($stream);
 
         try {
-            $class = new \ReflectionClass($subjectType);
-            $subject = $class->newInstanceWithoutConstructor();
-
-            if ($subject instanceof EventStreamEmitter) {
-                $subject->replay($stream);
-                return $subject;
-            }
-
-            throw new \RuntimeException(sprintf(
-                'Invalid subject type in stream - it does not implement: %s',
-                EventStreamEmitter::class
-            ));
+            return $this->recoverFrom($stream, $class);
         } catch (\ReflectionException $e) {
             throw new \RuntimeException(
-                "Could not recreate object of type: " . $subjectType,
+                "Could not recreate object of type: " . $class,
                 500,
                 $e
             );
@@ -80,13 +69,35 @@ class EventObjectStore
     private function extractSubjectClassName(EventStream $stream): string
     {
         foreach ($stream->getIterator() as $event) {
-            if ($event instanceof ObjectCreatedEvent) {
-                return $event->payload()['class_name'];
+            if (!$event instanceof ObjectCreatedEvent) {
+                throw new \RuntimeException(
+                    "Invalid stream: expected ObjectCreatedEvent as first event"
+                );
             }
 
-            throw new \RuntimeException(
-                "Invalid stream: expected ObjectCreatedEvent as first event"
-            );
+            return $event->payload()['class_name'];
         }
+    }
+
+    /**
+     * @param EventStream $stream
+     * @param string $subjectType
+     * @return EventStreamEmitter
+     * @throws \ReflectionException
+     */
+    private function recoverFrom(EventStream $stream, string $subjectType): EventStreamEmitter
+    {
+        $class = new \ReflectionClass($subjectType);
+        $subject = $class->newInstanceWithoutConstructor();
+
+        if (!$subject instanceof EventStreamEmitter) {
+            throw new \RuntimeException(sprintf(
+                'Invalid subject type in stream - it does not implement: %s',
+                EventStreamEmitter::class
+            ));
+        }
+
+        $subject->replay($stream);
+        return $subject;
     }
 }
