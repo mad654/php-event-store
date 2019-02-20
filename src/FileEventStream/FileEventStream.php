@@ -134,9 +134,20 @@ final class FileEventStream implements EventStream, Logable
         $this->flock(LOCK_EX);
         $serialized = $this->serialize($event);
         $newLine = "$serialized" . self::DELIMITER;
-        fwrite($this->fileHandle, $newLine);
-        fflush($this->fileHandle);
-        $this->flock(LOCK_SH);
+
+        try {
+            if (fwrite($this->fileHandle, $newLine) === false) throw new \RuntimeException("write failed");
+            if (fflush($this->fileHandle) === false) throw new \RuntimeException("flush failed");
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(sprintf(
+                "Could not append event: `%s`",
+                json_encode($event)),
+                500,
+                $e
+            );
+        } finally {
+            $this->flock(LOCK_SH);
+        }
 
         $this->logger->debug("attached event as `$newLine` to `$this->filePath`");
 
@@ -157,8 +168,7 @@ final class FileEventStream implements EventStream, Logable
 
     private function flock(int $lockMethod): void
     {
-        $result = flock($this->fileHandle, $lockMethod);
-        if ($result === false) {
+        if (flock($this->fileHandle, $lockMethod) === false) {
             throw new \RuntimeException("Could change lock to method: $lockMethod");
         }
     }
