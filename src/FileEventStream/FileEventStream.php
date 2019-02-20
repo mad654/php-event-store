@@ -136,8 +136,12 @@ final class FileEventStream implements EventStream, Logable
         $newLine = "$serialized" . self::DELIMITER;
 
         try {
-            if (fwrite($this->fileHandle, $newLine) === false) throw new \RuntimeException("write failed");
-            if (fflush($this->fileHandle) === false) throw new \RuntimeException("flush failed");
+            if (fwrite($this->fileHandle, $newLine) === false) {
+                throw new \RuntimeException("write failed");
+            }
+            if (fflush($this->fileHandle) === false) {
+                throw new \RuntimeException("flush failed");
+            }
         } catch (\Throwable $e) {
             throw new \RuntimeException(sprintf(
                 "Could not append event: `%s`",
