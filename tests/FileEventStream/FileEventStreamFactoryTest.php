@@ -100,8 +100,6 @@ class FileEventStreamFactoryTest extends FileTestCase
         $this->instance()->new('existing-id');
     }
 
-    // TODO filesystem error throws exception
-
     /**
      * @test
      */
