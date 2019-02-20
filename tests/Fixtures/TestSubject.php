@@ -11,6 +11,11 @@ use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 class TestSubject implements EventStreamEmitter
 {
     /**
+     * @var int
+     */
+    public $constructorInvocationCount = 0;
+
+    /**
      * @var string
      */
     private $id;
@@ -25,6 +30,7 @@ class TestSubject implements EventStreamEmitter
         $this->id = $id;
         $this->events = new MemoryEventStream();
         $this->events->append(new TestEvent($id));
+        $this->constructorInvocationCount++;
     }
 
     public function subjectId(): string

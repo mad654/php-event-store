@@ -18,3 +18,9 @@ make test
 make test.watch
 ```
 
+## concepts
+
+### EventStream
+
+Ist eine Liste von Events die sich auf das gleiche Subjekt beziehen und
+damit seinen Lebenszyklus repräsentieren.

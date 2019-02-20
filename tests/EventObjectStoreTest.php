@@ -62,6 +62,7 @@ class EventObjectStoreTest extends FileTestCase
     public function get_subjectIdKnown_returnsEqualSubject()
     {
         $expected = new TestSubject('one');
+        $expected->constructorInvocationCount = 0;
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
         $store->attach($expected);
 

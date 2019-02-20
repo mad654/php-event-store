@@ -8,6 +8,7 @@ use mad654\eventstore\Event;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventTraversable;
 use mad654\eventstore\Fixtures\TestEvent;
+use mad654\eventstore\Fixtures\TestSubject;
 use mad654\eventstore\TestCase\FileTestCase;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -118,5 +119,23 @@ class FileEventStreamTest extends FileTestCase
             iterator_to_array($expected->getIterator()),
             iterator_to_array($actual->getIterator())
         );
+    }
+
+    /**
+     * @test
+     */
+    public function toEventStreamEmitter_always_skipConstructor()
+    {
+        $expected = $this->instance();
+        $expected->append(new TestEvent("one"));
+
+        $object = $expected->toEventStreamEmitter();
+
+        if ($object instanceof TestSubject) {
+            $this->assertSame(0, $object->constructorInvocationCount);
+            return;
+        }
+
+        $this->fail("Expected object of class: " . TestSubject::class);
     }
 }

@@ -190,10 +190,25 @@ final class FileEventStream implements EventStream, Logable
     public function toEventStreamEmitter(): EventStreamEmitter
     {
         # TODO: refactor to common abstract base class?
-        # TODO: do not call constructor
         # TODO: Load subject class from stream
-        $subject = new TestSubject("replay_file");
-        $subject->replay($this);
-        return $subject;
+        $subjectType = TestSubject::class;
+
+        try {
+            $class = new \ReflectionClass($subjectType);
+            $subject = $class->newInstanceWithoutConstructor();
+            $subject->replay($this);
+
+            if ($subject instanceof EventStreamEmitter) {
+                return $subject;
+            }
+        } catch (\ReflectionException $e) {
+            throw new \RuntimeException(
+                "Could not recreate object of type: " . $subjectType,
+                500,
+                $e
+            );
+        }
+
+        # TODO: throw exception to make this error recoverable?
     }
 }
