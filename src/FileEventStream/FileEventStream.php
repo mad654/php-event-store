@@ -20,6 +20,7 @@ use Traversable;
  * @package mad654\eventstore
  *
  * TODO Error case: empty stream file
+ * TODO Refactor serialisation to json?
  */
 final class FileEventStream implements EventStream, Logable
 {

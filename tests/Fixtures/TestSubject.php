@@ -56,6 +56,7 @@ class TestSubject implements EventStreamEmitter
     private function on(Event $event)
     {
         # TODO support path syntax: path.to.payload.element
+        # TODO document how to create new subject
         $this->id = $event->payload()['someEventField'];
         $this->events->append($event);
     }
