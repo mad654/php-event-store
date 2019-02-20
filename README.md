@@ -5,6 +5,9 @@
 - composer in path
 - watchexec in path
 
+In local_develop is a prepared Vagrantfile
+which installs all needed dependencies.
+
 ## getting started
 
 ```
