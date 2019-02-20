@@ -40,7 +40,7 @@ class TestSubject implements EventStreamEmitter
 
     public function emitEventsTo(EventStream $stream): void
     {
-        $stream->appendUnknown($this->events);
+        $stream->appendAll($this->events);
     }
 
     public function replay(EventStream $stream): void

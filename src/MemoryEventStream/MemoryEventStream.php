@@ -41,9 +41,8 @@ class MemoryEventStream implements EventStream
         return $this;
     }
 
-    public function appendUnknown(EventStream $other): void
+    public function appendAll(EventStream $other): void
     {
-        # TODO: make sure we only import unknown events
         foreach ($other as $event) {
             $this->append($event);
         }

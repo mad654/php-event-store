@@ -64,7 +64,7 @@ class MemoryEventStreamTest extends TestCase
         $stream2 = $this->instance();
         $stream2->append(new TestEvent('two'));
 
-        $stream1->appendUnknown($stream2);
+        $stream1->appendAll($stream2);
 
         $this->assertCount(2, iterator_to_array($stream1->getIterator()));
     }

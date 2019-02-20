@@ -111,7 +111,7 @@ class FileEventStreamTest extends FileTestCase
         $stream2 = $this->instance('two');
         $stream2->append(new TestEvent('two'));
 
-        $stream1->appendUnknown($stream2);
+        $stream1->appendAll($stream2);
 
         $this->assertCount(2, iterator_to_array($stream1->getIterator()));
     }
