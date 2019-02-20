@@ -154,7 +154,7 @@ class Lighter implements EventStreamEmitter
 
 So instead of changing your member variables directly, you will use events for this, like shown in `switchLightOn`
 
-### Some better way by composition a generic state object? But will loos property hints in ide
+### Some better way by composition a generic state object? But will loos property hints in ide and don't see how to track child objects state
 
 ```php
 class Lighter implements EventStreamEmitter
@@ -234,30 +234,66 @@ class Lighter implements EventStreamEmitter
 
 ```php
 class Lighter {	
+    use ImutableDtoTrait;
+    
     private $id;
     private $light;
     
     public function __construct(string $id) {
         // EventBasedState::record will change its properties (on) + appends evt to stream
         $this->record(new GenericEvent(['id' => $id, 'light' => 'off'));
+        $this->enableEventSourcing(['id', 'light']);
     }
     
 	public function switchLightOn()
     {
         if ($this->light === 'on') return;
         // do some stuff which does the hard work
-        $this->record(new GenericEvent(['id' => $id, 'light' => 'on'));
+        $this->record(new GenericEvent(['light' => 'on'));
     }
     
     public function switchLightOff()
     {
         if ($this->light === 'off') return;
          // do some stuff which does the hard work
-        $this->record(new GenericEvent(['id' => $id, 'light' => 'off'));
+        $this->record(new GenericEvent(['light' => 'off'));
     }
                                         
     public function willFail() {
         $this->light = 'off'; // throws ImutablePropertyException
+    }
+}
+```
+
+
+
+### With transpiler this may be possible - will this work on child objects?
+
+```php
+evtsourced class Lighter {	
+    evtsourced private $id;
+    evtsourced private $light;
+    
+    public function __construct(string $id) {
+        // EventBasedState::record will change its properties (on) + appends evt to stream
+        $this->id = $id;
+        $this->light = $light;
+        // at the end of each public function, all property changes are recorded as a event,
+        // with the function name as indent
+    }
+    
+	public function switchLightOn()
+    {
+        if ($this->light === 'on') return;
+        // do some stuff which does the hard work
+        $this->light = 'off'
+    }
+    
+    public function switchLightOff()
+    {
+        if ($this->light === 'off') return;
+         // do some stuff which does the hard work
+        $this->light = 'on'
     }
 }
 ```
