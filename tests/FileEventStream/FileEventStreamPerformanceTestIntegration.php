@@ -15,13 +15,13 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
      */
     public function sut_singleFile100000Events_loadsIn200ms()
     {
-        $stream = $this->instance();
+        $stream = $this->newInstance();
 
         foreach (range(1, 100000) as $iteration) {
             $stream->append(new TestEvent($iteration));
         }
 
-        $actual = $this->instance();
+        $actual = $this->loadInstance();
 
         $diff = $this->takeTime(function () use ($actual) {
             $count = 0;
@@ -36,9 +36,21 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
     /**
      * @return FileEventStream
      */
-    public function instance(): FileEventStream
+    public function newInstance(): FileEventStream
     {
         $stream = FileEventStream::new(
+            $this->rootDirPath(),
+            'sut_singleFile1000Events_loadsIn100ms'
+        );
+        return $stream;
+    }
+
+    /**
+     * @return FileEventStream
+     */
+    public function loadInstance(): FileEventStream
+    {
+        $stream = FileEventStream::load(
             $this->rootDirPath(),
             'sut_singleFile1000Events_loadsIn100ms'
         );
