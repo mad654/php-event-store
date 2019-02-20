@@ -5,6 +5,7 @@ namespace mad654\eventstore;
 
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\EventStream\EventStreamFactory;
+use mad654\eventstore\Fixtures\TestSubject;
 
 /**
  *
@@ -39,7 +40,7 @@ class EventObjectStore
     {
         try {
             $stream = $this->streamFactory->get($key);
-            return $stream->toEventStreamEmitter();
+            return $this->toEventStreamEmitter($stream);
         } catch (\RuntimeException $e) {
             throw new \RuntimeException(
                 "Object with id `$key` not found",
@@ -47,5 +48,30 @@ class EventObjectStore
                 $e
             );
         }
+    }
+
+    private function toEventStreamEmitter($stream): EventStreamEmitter
+    {
+        # TODO: refactor to common abstract base class?
+        # TODO: Load subject class from stream
+        $subjectType = TestSubject::class;
+
+        try {
+            $class = new \ReflectionClass($subjectType);
+            $subject = $class->newInstanceWithoutConstructor();
+            $subject->replay($stream);
+
+            if ($subject instanceof EventStreamEmitter) {
+                return $subject;
+            }
+        } catch (\ReflectionException $e) {
+            throw new \RuntimeException(
+                "Could not recreate object of type: " . $subjectType,
+                500,
+                $e
+            );
+        }
+
+        # TODO: throw exception to make this error recoverable?
     }
 }

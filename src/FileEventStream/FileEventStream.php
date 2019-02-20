@@ -5,8 +5,6 @@ namespace mad654\eventstore\FileEventStream;
 
 use mad654\eventstore\Event;
 use mad654\eventstore\EventStream\EventStream;
-use mad654\eventstore\EventStream\EventStreamEmitter;
-use mad654\eventstore\Fixtures\TestSubject;
 use mad654\eventstore\Logable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -185,30 +183,5 @@ final class FileEventStream implements EventStream, Logable
         foreach ($other as $event) {
             $this->append($event);
         }
-    }
-
-    public function toEventStreamEmitter(): EventStreamEmitter
-    {
-        # TODO: refactor to common abstract base class?
-        # TODO: Load subject class from stream
-        $subjectType = TestSubject::class;
-
-        try {
-            $class = new \ReflectionClass($subjectType);
-            $subject = $class->newInstanceWithoutConstructor();
-            $subject->replay($this);
-
-            if ($subject instanceof EventStreamEmitter) {
-                return $subject;
-            }
-        } catch (\ReflectionException $e) {
-            throw new \RuntimeException(
-                "Could not recreate object of type: " . $subjectType,
-                500,
-                $e
-            );
-        }
-
-        # TODO: throw exception to make this error recoverable?
     }
 }

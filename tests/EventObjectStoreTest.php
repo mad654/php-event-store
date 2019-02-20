@@ -59,7 +59,7 @@ class EventObjectStoreTest extends FileTestCase
     /**
      * @test
      */
-    public function get_subjectIdKnown_returnsEqualSubject()
+    public function get_subjectIdKnown_returnsEqualSubjectWithoutCallingConstructor()
     {
         $expected = new TestSubject('one');
         $expected->constructorInvocationCount = 0;
