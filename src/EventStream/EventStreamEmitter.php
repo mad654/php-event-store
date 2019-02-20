@@ -8,4 +8,6 @@ interface EventStreamEmitter
     public function subjectId(): string;
 
     public function emitEventsTo(EventStream $stream);
+
+    public function replay(EventStream $stream): void;
 }

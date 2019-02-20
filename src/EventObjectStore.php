@@ -58,11 +58,16 @@ class EventObjectStore
         try {
             $class = new \ReflectionClass($subjectType);
             $subject = $class->newInstanceWithoutConstructor();
-            $subject->replay($stream);
 
             if ($subject instanceof EventStreamEmitter) {
+                $subject->replay($stream);
                 return $subject;
             }
+
+            throw new \RuntimeException(sprintf(
+                'Invalid subject type in stream - it does not implement: %s',
+                EventStreamEmitter::class
+            ));
         } catch (\ReflectionException $e) {
             throw new \RuntimeException(
                 "Could not recreate object of type: " . $subjectType,
@@ -70,8 +75,6 @@ class EventObjectStore
                 $e
             );
         }
-
-        # TODO: throw exception to make this error recoverable?
     }
 
     private function extractSubjectClassName(EventStream $stream): string
