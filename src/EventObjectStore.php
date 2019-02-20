@@ -3,9 +3,9 @@
 namespace mad654\eventstore;
 
 
+use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\EventStream\EventStreamFactory;
-use mad654\eventstore\Fixtures\TestSubject;
 
 /**
  *
@@ -33,7 +33,7 @@ class EventObjectStore
     public function attach(EventStreamEmitter $emitter): void
     {
         $stream = $this->streamFactory->new($emitter->subjectId());
-        $stream->append(ObjectCreatedEvent::for(new TestSubject('foo')));
+        $stream->append(ObjectCreatedEvent::for($emitter));
         $emitter->emitEventsTo($stream);
     }
 
@@ -51,11 +51,9 @@ class EventObjectStore
         }
     }
 
-    private function toEventStreamEmitter($stream): EventStreamEmitter
+    private function toEventStreamEmitter(EventStream $stream): EventStreamEmitter
     {
-        # TODO: refactor to common abstract base class?
-        # TODO: Load subject class from stream
-        $subjectType = TestSubject::class;
+        $subjectType = $this->extractSubjectClassName($stream);
 
         try {
             $class = new \ReflectionClass($subjectType);
@@ -74,5 +72,18 @@ class EventObjectStore
         }
 
         # TODO: throw exception to make this error recoverable?
+    }
+
+    private function extractSubjectClassName(EventStream $stream): string
+    {
+        foreach ($stream->getIterator() as $event) {
+            if ($event instanceof ObjectCreatedEvent) {
+                return $event->payload()['class_name'];
+            }
+
+            throw new \RuntimeException(
+                "Invalid stream: expected ObjectCreatedEvent as first event"
+            );
+        }
     }
 }
