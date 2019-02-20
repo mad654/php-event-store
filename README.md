@@ -65,12 +65,14 @@ class Lighter {
     
 	public function switchLightOn()
     {
+        if ($this->light === 'on') return;
         // do some stuff which does the hard work
         $this->light = 'on';
     }
     
     public function switchLightOff()
     {
+        if ($this->light === 'off') return;
          // do some stuff which does the hard work
         $this->light = 'off';
     }
@@ -82,6 +84,8 @@ This is a good beginning, but now you need a way to persist the state.
 ### EventStreamEmitter
 
 Instead of creating a database you can extend your class to implement the EventStreamEmitter interface. An EventStreamEmitter is simply an object which should be available in his current state in the next request and for this it can publish its events as a stream and can be build from scratch based on the events:
+
+### Full implemented version, can be shorter with traits
 
 ```php
 use mad654\eventstore\EventStream\EventStream;
@@ -103,12 +107,14 @@ class Lighter implements EventStreamEmitter
     
     public function switchLightOn(): void
     {
+        if ($this->light === 'on') return;
         // do some stuff which does the hard work
         $this->record(new StateChanged(['light' => 'on']));
     }
     
     public function switchLightOff(): void
     {
+        if ($this->light === 'off') return;
         // do some stuff which does the hard work
         $this->record(new StateChanged(['light' => 'off']));
     }
@@ -147,6 +153,116 @@ class Lighter implements EventStreamEmitter
 ```
 
 So instead of changing your member variables directly, you will use events for this, like shown in `switchLightOn`
+
+### Some better way by composition a generic state object? But will loos property hints in ide
+
+```php
+class Lighter implements EventStreamEmitter
+{
+    private $state; // Imuteable public properites
+    
+    public function __construct(string $id) {
+        $this->state = new EventBasedState(['id', 'light']);
+        // EventBasedState::record will change its properties (on) + appends evt to stream
+        $this->state->record(new GenericEvent($id));
+    }
+    
+    public function switchLightOn(): void
+    {
+        if ($this->state->light === 'on') return;
+        // do some stuff which does the hard work
+        $this->state->record(new StateChanged(['light' => 'on']));
+    }
+    
+    public function switchLightOff(): void
+    {
+        if ($this->state->light === 'off') return;
+        // do some stuff which does the hard work
+        $this->state->record(new StateChanged(['light' => 'off']));
+    }
+
+    public function emitEventsTo(EventStream $stream): void {
+        $this->state->emitEventsTo($stream);
+    }
+
+    public function replay(EventStream $stream): void {
+        $this->state->replay($stream);
+    }
+}
+```
+
+
+
+
+
+### More shorter (exopse state object)
+
+```php
+class Lighter implements EventStreamEmitter
+{
+    private $state; // Imuteable public properites
+    
+    public function __construct(string $id) {
+        $this->state = new EventBasedState(['id', 'light']);
+        // EventBasedState::record will change its properties (on) + appends evt to stream
+        $this->state->record(new GenericEvent($id));
+    }
+    
+    public function switchLightOn(): void
+    {
+        if ($this->state->light === 'on') return;
+        // do some stuff which does the hard work
+        $this->state->record(new StateChanged(['light' => 'on']));
+    }
+    
+    public function switchLightOff(): void
+    {
+        if ($this->state->light === 'off') return;
+        // do some stuff which does the hard work
+        $this->state->record(new StateChanged(['light' => 'off']));
+    }
+
+    public function state(): EventBasedState {
+       return $this->state;
+    }
+}
+```
+
+
+
+### last but not least
+
+```php
+class Lighter {	
+    private $id;
+    private $light;
+    
+    public function __construct(string $id) {
+        // EventBasedState::record will change its properties (on) + appends evt to stream
+        $this->record(new GenericEvent(['id' => $id, 'light' => 'off'));
+    }
+    
+	public function switchLightOn()
+    {
+        if ($this->light === 'on') return;
+        // do some stuff which does the hard work
+        $this->record(new GenericEvent(['id' => $id, 'light' => 'on'));
+    }
+    
+    public function switchLightOff()
+    {
+        if ($this->light === 'off') return;
+         // do some stuff which does the hard work
+        $this->record(new GenericEvent(['id' => $id, 'light' => 'off'));
+    }
+                                        
+    public function willFail() {
+        $this->light = 'off'; // throws ImutablePropertyException
+    }
+}
+```
+
+
 
 ### EventObjectStore
 
