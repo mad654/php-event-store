@@ -44,6 +44,22 @@ class EventObjectStoreTest extends FileTestCase
     /**
      * @test
      */
+    public function attach_always_createsInternalEventForMetaInformations()
+    {
+        $stream = FileEventStream::new($this->rootDirPath(), 'some-subject-id');
+        $this->streamFactory
+            ->method('new')
+            ->willReturn($stream);
+
+        $this->instance()->attach(new TestSubject('some-subject-id'));
+        $streamData = iterator_to_array($stream->getIterator());
+
+        $this->assertInstanceOf(ObjectCreatedEvent::class, $streamData[0]);
+    }
+
+    /**
+     * @test
+     */
     public function attach_always_fwdEventsToNewStream()
     {
         $stream = FileEventStream::new($this->rootDirPath(), 'some-subject-id');
@@ -53,7 +69,7 @@ class EventObjectStoreTest extends FileTestCase
 
         $this->instance()->attach(new TestSubject('some-subject-id'));
 
-        $this->assertCount(1, iterator_to_array($stream->getIterator()));
+        $this->assertCount(2, iterator_to_array($stream->getIterator()));
     }
 
     /**
@@ -67,6 +83,11 @@ class EventObjectStoreTest extends FileTestCase
         $store->attach($expected);
 
         $actual = $store->get('one');
+
+        $expected->events = null;
+        if ($actual instanceof TestSubject) {
+            $actual->events = null;
+        }
 
         $this->assertEquals($expected, $actual);
     }

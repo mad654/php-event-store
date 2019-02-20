@@ -33,6 +33,7 @@ class EventObjectStore
     public function attach(EventStreamEmitter $emitter): void
     {
         $stream = $this->streamFactory->new($emitter->subjectId());
+        $stream->append(ObjectCreatedEvent::for(new TestSubject('foo')));
         $emitter->emitEventsTo($stream);
     }
 

@@ -23,7 +23,7 @@ class TestSubject implements EventStreamEmitter
     /**
      * @var EventStream
      */
-    private $events;
+    public $events;
 
     public function __construct(string $id)
     {
