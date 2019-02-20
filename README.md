@@ -25,5 +25,12 @@ make test.watch
 
 ### EventStream
 
-Ist eine Liste von Events die sich auf das gleiche Subjekt beziehen und
-damit seinen Lebenszyklus repräsentieren.
+Ist eine Liste von Events.
+
+EventEmitter sind Subjects die über EventStream persistiert werden.
+
+Sobald ein EventEmitter dem ObjectEventStore mittels attach hinzugefügt
+wurde, werden alle aktuellen und alle neuen Events persistiert.
+
+Ob alle neuen Events persistiert werden, hängt von der Implementierung
+des Subjects ab.

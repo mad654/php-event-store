@@ -41,12 +41,15 @@ class TestSubject implements EventStreamEmitter
     public function emitEventsTo(EventStream $stream): void
     {
         $stream->appendAll($this->events);
+        # fixme: this makes subject unserializable
+        $this->events = $stream;
     }
 
     public function replay(EventStream $stream): void
     {
         $this->id = null;
-        $this->events = new MemoryEventStream();
+        # fixme: this makes subject unserializable
+        $this->events = $stream;
 
         foreach ($stream->getIterator() as $event) {
             $this->on($event);
@@ -57,12 +60,15 @@ class TestSubject implements EventStreamEmitter
     {
         # TODO support path syntax: path.to.payload.element
         # TODO document how to create new subject by example patient
-        $this->id = $event->payload()['someEventField'];
-        $this->events->append($event);
+        if (isset($event->payload()['someEventField'])) {
+            $this->id = $event->payload()['someEventField'];
+        }
     }
 
     public function dummyEventAction($i)
     {
-        $this->events->append(new TestEvent($i));
+        $event = new TestEvent($i);
+        $this->on($event);
+        $this->events->append($event);
     }
 }

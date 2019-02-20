@@ -74,6 +74,28 @@ class EventObjectStoreTest extends FileTestCase
 
     /**
      * @test
+     *
+     * fixme: test depends on TestSubject::attach implementation
+     */
+    public function attach_changesAfterAttach_trackedAutomatically()
+    {
+        $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
+        $expected = new TestSubject('initial-id');
+        $store->attach($expected);
+
+        $expected->dummyEventAction(9);
+
+        $acutal = $store->get('initial-id');
+        if (!$acutal instanceof TestSubject) {
+            $this->fail("Actual instance of TestSubject");
+        }
+
+        $this->assertCount(3, $acutal->events);
+        $this->assertEquals(9, $acutal->subjectId());
+    }
+
+    /**
+     * @test
      */
     public function get_subjectIdKnown_returnsEqualSubjectWithoutCallingConstructor()
     {
@@ -100,6 +122,30 @@ class EventObjectStoreTest extends FileTestCase
     public function get_subjectIdUnknown_throwsException()
     {
         $this->instance(new FileEventStreamFactory($this->rootDirPath()))->get('unknown');
+    }
+
+    /**
+     * @test
+     * fixme: test depends on TestSubject::replay implementation
+     */
+    public function get_changesAfterLoad_trackedAutomatically()
+    {
+        $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
+        $store->attach(new TestSubject('initial-id'));
+        $expected = $store->get('initial-id');
+        if (!$expected instanceof TestSubject) {
+            $this->fail("Expected instance of TestSubject");
+        }
+
+        $expected->dummyEventAction(9);
+
+        $acutal = $store->get('initial-id');
+        if (!$acutal instanceof TestSubject) {
+            $this->fail("Expected instance of TestSubject");
+        }
+
+        $this->assertCount(3, $acutal->events);
+        $this->assertEquals(9, $acutal->subjectId());
     }
 
     public function instance(FileEventStreamFactory $factory = null): EventObjectStore

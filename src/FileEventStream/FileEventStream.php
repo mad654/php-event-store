@@ -142,6 +142,7 @@ final class FileEventStream implements EventStream, Logable
             if (fflush($this->fileHandle) === false) {
                 throw new \RuntimeException("flush failed");
             }
+            clearstatcache(true, $this->filePath);
         } catch (\Throwable $e) {
             throw new \RuntimeException(sprintf(
                 "Could not append event: `%s`",
