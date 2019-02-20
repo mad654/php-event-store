@@ -89,7 +89,17 @@ class FileEventStreamFactoryTest extends FileTestCase
         $this->assertCount(3, scandir($this->rootDirPath()));
     }
 
-    // TODO new file exists throws exception
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Stream with id `existing-id` already exists
+     */
+    public function new_fileExists_throwsException()
+    {
+        $this->instance()->new('existing-id');
+        $this->instance()->new('existing-id');
+    }
+
     // TODO filesystem error throws exception
 
     /**
