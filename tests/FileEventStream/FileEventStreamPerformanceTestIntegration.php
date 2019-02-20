@@ -13,7 +13,7 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
      * @test
      * @throws \Exception
      */
-    public function iterateAllEvents_singleFile10000Events_loadsIn35ms()
+    public function iterateAllEvents_singleFile10000Events_loadsIn50ms()
     {
         $stream = $this->newInstance();
 
@@ -30,7 +30,7 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
             }
         });
 
-        $this->assertlessThanOrEqual(35, $diff, $diff);
+        $this->assertlessThanOrEqual(50, $diff, $diff);
     }
 
     /**
