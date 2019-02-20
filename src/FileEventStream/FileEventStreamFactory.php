@@ -21,6 +21,20 @@ class FileEventStreamFactory implements EventStreamFactory
 
     public function __construct(string $rootDirPath)
     {
+        if (!file_exists($rootDirPath)) {
+            throw new \RuntimeException(sprintf(
+                'Root directory not exists: ´%s´ - mount failed?',
+                $rootDirPath
+            ));
+        }
+
+        if (!is_writeable($rootDirPath)) {
+            throw new \RuntimeException(sprintf(
+                'Root directory not writable: ´%s´',
+                $rootDirPath
+            ));
+        }
+
         $this->rooDirPath = $rootDirPath;
         $this->knownStreams = [];
     }

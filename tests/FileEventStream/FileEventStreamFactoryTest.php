@@ -17,6 +17,42 @@ class FileEventStreamFactoryTest extends FileTestCase
         $this->assertInstanceOf(EventStreamFactory::class, $this->instance());
     }
 
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Root directory not exists: ´/var/not-existing-dir´ - mount failed?
+     */
+    public function construct_rootDirectoryNotExists_throwsException()
+    {
+        new FileEventStreamFactory('/var/not-existing-dir');
+    }
+
+    /**
+     * @test
+     */
+    public function construct_rootDirectoryNotWritable_throwsException()
+    {
+        $rootDir = $this->rootDirPath() . DIRECTORY_SEPARATOR . 'not-writeable';
+        mkdir($rootDir, 0555);
+
+        try {
+            new FileEventStreamFactory($rootDir);
+        } catch (\RuntimeException $e) {
+            $this->assertStringStartsWith(
+                'Root directory not writable: ´',
+                $e->getMessage()
+            );
+
+            return;
+        } finally {
+            chmod($rootDir, 0777);
+        }
+
+        $this->fail("Expected RuntimeException");
+    }
+
+    // TODO construct directory not directory, throws exception
+
     public function instance(): FileEventStreamFactory
     {
         return new FileEventStreamFactory($this->rootDirPath());
@@ -30,6 +66,9 @@ class FileEventStreamFactoryTest extends FileTestCase
         $this->instance()->new('some-id');
         $this->assertCount(3, scandir($this->rootDirPath()));
     }
+
+    // TODO new file exists throws exception
+    // TODO filesystem error throws exception
 
     /**
      * @test
@@ -54,11 +93,6 @@ class FileEventStreamFactoryTest extends FileTestCase
     {
         $this->instance()->get('unknown');
     }
-
-    // TODO construct directory not exists, throws exception
-    // TODO construct directory not writeable, throws exception
-    // TODO new file exists throws exception
-    // TODO filesystem error throws exception
 
     /**
      * @test
