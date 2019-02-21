@@ -5,7 +5,7 @@ namespace mad654\eventstore\example;
 
 use mad654\eventstore\Event;
 use mad654\eventstore\event\StateChanged;
-use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\AutoTrackingEventStreamEmitterTrait;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 
@@ -17,6 +17,8 @@ use mad654\eventstore\MemoryEventStream\MemoryEventStream;
  */
 class LightSwitch implements EventStreamEmitter
 {
+    use AutoTrackingEventStreamEmitterTrait;
+
     /**
      * @var int
      */
@@ -32,16 +34,10 @@ class LightSwitch implements EventStreamEmitter
      */
     private $kitchen;
 
-    /**
-     * @var EventStream
-     */
-    public $events;
-
     public function __construct(string $id)
     {
-        $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->append(new StateChanged(['id' => $id, 'kitchen' => false]));
+        $this->record(new StateChanged(['id' => $id, 'kitchen' => false]));
         $this->constructorInvocationCount++;
     }
 
@@ -75,30 +71,4 @@ class LightSwitch implements EventStreamEmitter
         $this->kitchen = $event->get('kitchen', $this->kitchen);
     }
 
-    public function emitEventsTo(EventStream $stream): void
-    {
-        $stream->appendAll($this->events);
-        # fixme: this makes subject unserializable, maybe we can feed in a proxy stream, which uses static calls to retrieve the real stream
-        $this->events = $stream;
-    }
-
-    public function replay(EventStream $stream): void
-    {
-        $this->id = null;
-        # fixme: this makes subject unserializable, maybe we can feed in a proxy stream, which uses static calls to retrieve the real stream
-        $this->events = $stream;
-
-        foreach ($stream->getIterator() as $event) {
-            $this->on($event);
-        }
-    }
-
-    /**
-     * @param StateChanged $event
-     */
-    private function record(StateChanged $event): void
-    {
-        $this->on($event);
-        $this->events->append($event);
-    }
 }

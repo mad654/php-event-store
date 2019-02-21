@@ -94,17 +94,21 @@ Instead of creating a database you can extend your class to implement the EventS
 ```php
 <?php
 
+<?php
+
 namespace mad654\eventstore\example;
 
 
 use mad654\eventstore\Event;
 use mad654\eventstore\event\StateChanged;
-use mad654\eventstore\EventStream\EventStream;
+use mad654\eventstore\EventStream\AutoTrackingEventStreamEmitter;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 
 class LightSwitch implements EventStreamEmitter
 {
+    use AutoTrackingEventStreamEmitterTrait;
+
     /**
      * @var string
      */
@@ -115,16 +119,11 @@ class LightSwitch implements EventStreamEmitter
      */
     private $kitchen;
 
-    /**
-     * @var EventStream
-     */
-    public $events;
-
     public function __construct(string $id)
     {
-        $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->append(new StateChanged(['id' => $id, 'kitchen' => false]));
+        $this->record(new StateChanged(['id' => $id, 'kitchen' => false]));
+        $this->constructorInvocationCount++;
     }
 
     public function subjectId(): string
@@ -132,7 +131,8 @@ class LightSwitch implements EventStreamEmitter
         return $this->id;
     }
 
-    public function isKitchenOn(): bool {
+    public function isKitchenOn(): bool
+    {
         return $this->kitchen;
     }
 
@@ -156,27 +156,6 @@ class LightSwitch implements EventStreamEmitter
         $this->kitchen = $event->get('kitchen', $this->kitchen);
     }
 
-    public function emitEventsTo(EventStream $stream): void
-    {
-        $stream->appendAll($this->events);
-        $this->events = $stream;
-    }
-
-    public function replay(EventStream $stream): void
-    {
-        $this->id = null;
-        $this->events = $stream;
-
-        foreach ($stream->getIterator() as $event) {
-            $this->on($event);
-        }
-    }
-
-    private function record(StateChanged $event): void
-    {
-        $this->on($event);
-        $this->events->append($event);
-    }
 }
 ```
 
