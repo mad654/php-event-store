@@ -163,32 +163,14 @@ So instead of changing your member variables directly, you will use events for t
 class Lighter {	
     use ImutableDtoTrait;
     
-    private $id;
-    private $light;
-    
-    public function __construct(string $id) {
-        // EventBasedState::record will change its properties (on) + appends evt to stream
-        $this->record(new GenericEvent(['id' => $id, 'light' => 'off'));
-        $this->enableEventSourcing(['id', 'light']);
-    }
-    
-	public function switchLightOn()
-    {
-        if ($this->light === 'on') return;
-        // do some stuff which does the hard work
-        $this->record(new GenericEvent(['light' => 'on'));
-    }
-    
-    public function switchLightOff()
-    {
-        if ($this->light === 'off') return;
-         // do some stuff which does the hard work
-        $this->record(new GenericEvent(['light' => 'off'));
-    }
+    ...
                                         
     public function willFail() {
         $this->light = 'off'; // throws ImutablePropertyException
     }
+    
+    ...
+        
 }
 ```
 
