@@ -3,24 +3,37 @@
 namespace mad654\eventstore\event;
 
 
+use Dflydev\DotAccessData\Data;
 use mad654\eventstore\Event;
 
-# TODO: support array of key => value pairs (tree)
-# TODO: support easy access to payload values with defaults (example: GenericEvent::value($key, $default = null)
 class StateChanged implements Event
 {
     /**
-     * @var array
+     * @var Data
      */
     private $payload;
 
     public function __construct(array $payload)
     {
-        $this->payload = $payload;
+        $this->payload = new Data($payload);
     }
 
     public function payload(): array
     {
-        return $this->payload;
+        return $this->payload->export();
+    }
+
+    public function has(string $key): bool
+    {
+        return $this->payload->has($key);
+    }
+
+    public function get(string $key, $default = null)
+    {
+        if (!$this->payload->has($key)) {
+            return $default;
+        }
+
+        return $this->payload->get($key);
     }
 }
