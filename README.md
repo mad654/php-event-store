@@ -60,21 +60,21 @@ think objects of your domain as process which different states, each state chang
 Lets take this little example to get in touch with all the new stuff. Lets asume you want to control the light in your Kittchen and for this you have build some switch. All you need is an object which can control the state and keeps its current state over mutlitple requests:
 
 ```php
-class Lighter {	
-    private $light = 'off';
+class LightSwitch {	
+    private $kittchen = 'off';
     
 	public function switchLightOn()
     {
-        if ($this->light === 'on') return;
+        if ($this->kittchen === 'on') return;
         // do some stuff which does the hard work
-        $this->light = 'on';
+        $this->kittchen = 'on';
     }
     
     public function switchLightOff()
     {
-        if ($this->light === 'off') return;
+        if ($this->kittchen === 'off') return;
          // do some stuff which does the hard work
-        $this->light = 'off';
+        $this->kittchen = 'off';
     }
 }
 ```
@@ -92,31 +92,31 @@ use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 
-class Lighter implements EventStreamEmitter
+class LightSwitch implements EventStreamEmitter
 {
     private $id;
     private $events;
     
-    private $light = 'off';
+    private $kittchen;
     
     public function __construct(string $id) {
         $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->append(new GenericEvent($id));
+        $this->events->append(new GenericEvent(['id' => $id, 'kittchen' => 'off']));
     }
     
     public function switchLightOn(): void
     {
-        if ($this->light === 'on') return;
+        if ($this->kittchen === 'on') return;
         // do some stuff which does the hard work
-        $this->record(new StateChanged(['light' => 'on']));
+        $this->record(new StateChanged(['kittchen' => 'on']));
     }
     
     public function switchLightOff(): void
     {
-        if ($this->light === 'off') return;
+        if ($this->kittchen === 'off') return;
         // do some stuff which does the hard work
-        $this->record(new StateChanged(['light' => 'off']));
+        $this->record(new StateChanged(['kittchen' => 'off']));
     }
     
     private function record(Event $event): void
@@ -128,8 +128,8 @@ class Lighter implements EventStreamEmitter
     private function on(Event $event)
     {
         // if 'id' not defined in event, use current value
-        $this->id = $event->value('id', $this->id); 
-        $this->light = $event->value('light', $this->light);
+        $this->id = $event->get('id', $this->id); 
+        $this->kittchen = $event->get('kittchen', $this->light);
     }
     
     public function subjectId(): string {

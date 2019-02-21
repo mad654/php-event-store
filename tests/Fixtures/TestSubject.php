@@ -9,6 +9,12 @@ use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 
+/**
+ * Class TestSubject
+ * @package mad654\eventstore\Fixtures
+ *
+ * TODO refactor to lighter example
+ */
 class TestSubject implements EventStreamEmitter
 {
     /**
