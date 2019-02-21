@@ -274,7 +274,7 @@ evtsourced class Lighter {
     evtsourced private $id;
     evtsourced private $light;
     
-    public function __construct(string $id) {
+    evtsourced public function __construct(string $id) {
         // EventBasedState::record will change its properties (on) + appends evt to stream
         $this->id = $id;
         $this->light = $light;
@@ -282,14 +282,14 @@ evtsourced class Lighter {
         // with the function name as indent
     }
     
-	public function switchLightOn()
+	evtsourced public function switchLightOn()
     {
         if ($this->light === 'on') return;
         // do some stuff which does the hard work
         $this->light = 'off'
     }
     
-    public function switchLightOff()
+    evtsourced public function switchLightOff()
     {
         if ($this->light === 'off') return;
          // do some stuff which does the hard work

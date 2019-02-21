@@ -3,8 +3,8 @@
 namespace mad654\eventstore;
 
 
+use mad654\eventstore\event\StateChanged;
 use mad654\eventstore\FileEventStream\FileEventStream;
-use mad654\eventstore\Fixtures\TestEvent;
 use mad654\eventstore\TestCase\FileTestCase;
 
 class FileEventStreamPerformanceTestIntegration extends FileTestCase
@@ -18,7 +18,7 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
         $stream = $this->newInstance();
 
         foreach (range(1, 10000) as $iteration) {
-            $stream->append(new TestEvent($iteration));
+            $stream->append(new StateChanged($iteration));
         }
 
         $actual = $this->loadInstance();

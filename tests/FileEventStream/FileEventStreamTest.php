@@ -5,9 +5,9 @@ namespace mad654\eventstore\FileEventStream;
 
 use Consolidation\Log\Logger;
 use mad654\eventstore\Event;
+use mad654\eventstore\event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventTraversable;
-use mad654\eventstore\Fixtures\TestEvent;
 use mad654\eventstore\TestCase\FileTestCase;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -60,7 +60,7 @@ class FileEventStreamTest extends FileTestCase
     public function getIterator_always_returnsEvents()
     {
         $actual = $this->instance()
-            ->append(new TestEvent('one'));
+            ->append(new StateChanged(['name' => 'one']));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -75,14 +75,14 @@ class FileEventStreamTest extends FileTestCase
     public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
     {
         $actual = $this->instance()
-            ->append(new TestEvent('one'))
-            ->append(new TestEvent('two'));
+            ->append(new StateChanged(['name' => 'one']))
+            ->append(new StateChanged(['name' => 'two']));
 
         $actual = iterator_to_array($actual->getIterator());
 
         $this->assertCount(2, $actual);
-        $this->assertEquals(new TestEvent("one"), $actual[0]);
-        $this->assertEquals(new TestEvent("two"), $actual[1]);
+        $this->assertEquals(new StateChanged(['name' => 'one']), $actual[0]);
+        $this->assertEquals(new StateChanged(['name' => 'two']), $actual[1]);
     }
 
     /**
@@ -107,9 +107,9 @@ class FileEventStreamTest extends FileTestCase
     public function importFrom_bothOneElement_hasTwoElements()
     {
         $stream1 = $this->instance('one');
-        $stream1->append(new TestEvent('one'));
+        $stream1->append(new StateChanged(['name' => 'one']));
         $stream2 = $this->instance('two');
-        $stream2->append(new TestEvent('two'));
+        $stream2->append(new StateChanged(['name' => 'two']));
 
         $stream1->appendAll($stream2);
 
@@ -122,11 +122,11 @@ class FileEventStreamTest extends FileTestCase
     public function sut_always_persistsAddedEvents()
     {
         $expected = $this->instance();
-        $expected->append(new TestEvent("one"));
+        $expected->append(new StateChanged(['name' => 'one']));
         unset($expected);
 
         $expected = $this->loadInstance();
-        $expected->append(new TestEvent("two"));
+        $expected->append(new StateChanged(['name' => 'two']));
 
         $actual = $this->loadInstance();
 

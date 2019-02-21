@@ -3,8 +3,8 @@
 namespace mad654\eventstore\FileEventStream;
 
 
+use mad654\eventstore\event\StateChanged;
 use mad654\eventstore\EventStream\EventStreamFactory;
-use mad654\eventstore\Fixtures\TestEvent;
 use mad654\eventstore\TestCase\FileTestCase;
 
 class FileEventStreamFactoryTest extends FileTestCase
@@ -107,7 +107,7 @@ class FileEventStreamFactoryTest extends FileTestCase
     {
         $factory = $this->instance();
         $expected = $factory->new('some-id')
-            ->append(new TestEvent('one'));
+            ->append(new StateChanged(['name' => 'one']));
 
         $actual = $factory->get('some-id');
 
@@ -130,8 +130,8 @@ class FileEventStreamFactoryTest extends FileTestCase
     public function get_newFactoryInstance_returnsStreamInstanceWithEqualEvents()
     {
         $expected = $this->instance()->new('some-id')
-            ->append(new TestEvent('one'))
-            ->append(new TestEvent('two'));
+            ->append(new StateChanged(['name' => 'one']))
+            ->append(new StateChanged(['name' => 'two']));
 
         $actual = $this->instance()->get('some-id');
 

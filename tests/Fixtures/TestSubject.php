@@ -4,6 +4,7 @@ namespace mad654\eventstore\Fixtures;
 
 
 use mad654\eventstore\Event;
+use mad654\eventstore\event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
@@ -29,7 +30,7 @@ class TestSubject implements EventStreamEmitter
     {
         $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->append(new TestEvent($id));
+        $this->events->append(new StateChanged(['id' => $id]));
         $this->constructorInvocationCount++;
     }
 
@@ -60,14 +61,14 @@ class TestSubject implements EventStreamEmitter
     {
         # TODO support path syntax: path.to.payload.element
         # TODO document how to create new subject by example patient
-        if (isset($event->payload()['someEventField'])) {
-            $this->id = $event->payload()['someEventField'];
+        if (isset($event->payload()['id'])) {
+            $this->id = $event->payload()['id'];
         }
     }
 
     public function dummyEventAction($i)
     {
-        $event = new TestEvent($i);
+        $event = new StateChanged(['id' => $i]);
         $this->on($event);
         $this->events->append($event);
     }

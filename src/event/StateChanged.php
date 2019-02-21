@@ -1,27 +1,22 @@
 <?php
 
-namespace mad654\eventstore\Fixtures;
+namespace mad654\eventstore\event;
 
 
 use mad654\eventstore\Event;
 
-# TODO: rename to StateChanged
 # TODO: support array of key => value pairs (tree)
 # TODO: support easy access to payload values with defaults (example: GenericEvent::value($key, $default = null)
-class TestEvent implements Event
+class StateChanged implements Event
 {
     /**
      * @var array
      */
     private $payload;
 
-    /**
-     * TestEvent constructor.
-     * @param string $someEventField
-     */
-    public function __construct(string $someEventField)
+    public function __construct(array $payload)
     {
-        $this->payload = ['someEventField' => $someEventField];
+        $this->payload = $payload;
     }
 
     public function payload(): array
