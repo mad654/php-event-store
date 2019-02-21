@@ -135,15 +135,13 @@ class LightSwitch implements EventStreamEmitter
     public function switchKitchenOn()
     {
         if ($this->kitchen) return;
-        $event = new StateChanged(['kitchen' => true]);
-        $this->record($event);
+        $this->record(new StateChanged(['kitchen' => true]));
     }
 
     public function switchKitchenOff()
     {
         if (!$this->kitchen) return;
-        $event = new StateChanged(['kitchen' => false]);
-        $this->record($event);
+        $this->record(new StateChanged(['kitchen' => false]));
     }
 
     private function on(Event $event)
