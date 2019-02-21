@@ -3,7 +3,7 @@
 namespace mad654\eventstore;
 
 
-use mad654\eventstore\Fixtures\TestSubject;
+use mad654\eventstore\example\LightSwitch;
 use PHPUnit\Framework\TestCase;
 
 class ObjectCreatedEventTest extends TestCase
@@ -13,7 +13,7 @@ class ObjectCreatedEventTest extends TestCase
      */
     public function createFor_always_createInstance()
     {
-        $actual = ObjectCreatedEvent::for(new TestSubject('foo'));
+        $actual = ObjectCreatedEvent::for(new LightSwitch('foo'));
 
         $this->assertInstanceOf(ObjectCreatedEvent::class, $actual);
         $this->assertInstanceOf(Event::class, $actual);
@@ -24,10 +24,10 @@ class ObjectCreatedEventTest extends TestCase
      */
     public function payload_always_containsValidClassName()
     {
-        $event = ObjectCreatedEvent::for(new TestSubject('foo'));
+        $event = ObjectCreatedEvent::for(new LightSwitch('foo'));
 
         $actual = $event->payload();
 
-        $this->assertEquals(['class_name' => TestSubject::class], $actual);
+        $this->assertEquals(['class_name' => LightSwitch::class], $actual);
     }
 }

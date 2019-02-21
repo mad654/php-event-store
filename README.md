@@ -61,20 +61,24 @@ Lets take this little example to get in touch with all the new stuff. Lets asume
 
 ```php
 class LightSwitch {	
-    private $kittchen = 'off';
+    private $kitchen = 'off';
     
-	public function switchLightOn()
-    {
-        if ($this->kittchen === 'on') return;
-        // do some stuff which does the hard work
-        $this->kittchen = 'on';
+    public function isKitchenOn(): bool {
+        return $this->kitchen;
     }
     
-    public function switchLightOff()
+	public function switchKitchenOn()
     {
-        if ($this->kittchen === 'off') return;
+        if ($this->kitchen === 'on') return;
+        // do some stuff which does the hard work
+        $this->kitchen = 'on';
+    }
+    
+    public function switchKitchenOff()
+    {
+        if ($this->kitchen === 'off') return;
          // do some stuff which does the hard work
-        $this->kittchen = 'off';
+        $this->kitchen = 'off';
     }
 }
 ```
@@ -88,66 +92,90 @@ Instead of creating a database you can extend your class to implement the EventS
 ### Full implemented version, can be shorter with traits
 
 ```php
+<?php
+
+namespace mad654\eventstore\example;
+
+
+use mad654\eventstore\Event;
+use mad654\eventstore\event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 
 class LightSwitch implements EventStreamEmitter
 {
+    /**
+     * @var string
+     */
     private $id;
-    private $events;
-    
-    private $kittchen;
-    
-    public function __construct(string $id) {
+
+    /**
+     * @var string
+     */
+    private $kitchen;
+
+    /**
+     * @var EventStream
+     */
+    public $events;
+
+    public function __construct(string $id)
+    {
         $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->append(new GenericEvent(['id' => $id, 'kittchen' => 'off']));
-    }
-    
-    public function switchLightOn(): void
-    {
-        if ($this->kittchen === 'on') return;
-        // do some stuff which does the hard work
-        $this->record(new StateChanged(['kittchen' => 'on']));
-    }
-    
-    public function switchLightOff(): void
-    {
-        if ($this->kittchen === 'off') return;
-        // do some stuff which does the hard work
-        $this->record(new StateChanged(['kittchen' => 'off']));
-    }
-    
-    private function record(Event $event): void
-    {
-        $this->on($event);
-        $this->events->append($event);
-    }
-    
-    private function on(Event $event)
-    {
-        // if 'id' not defined in event, use current value
-        $this->id = $event->get('id', $this->id); 
-        $this->kittchen = $event->get('kittchen', $this->light);
-    }
-    
-    public function subjectId(): string {
-        return $this->id
+        $this->events->append(new StateChanged(['id' => $id, 'kitchen' => false]));
     }
 
-    public function emitEventsTo(EventStream $stream): void {
+    public function subjectId(): string
+    {
+        return $this->id;
+    }
+
+    public function isKitchenOn(): bool {
+        return $this->kitchen;
+    }
+
+    public function switchKitchenOn()
+    {
+        if ($this->kitchen) return;
+        $event = new StateChanged(['kitchen' => true]);
+        $this->record($event);
+    }
+
+    public function switchKitchenOff()
+    {
+        if (!$this->kitchen) return;
+        $event = new StateChanged(['kitchen' => false]);
+        $this->record($event);
+    }
+
+    private function on(Event $event)
+    {
+        $this->id = $event->get('id', $this->id);
+        $this->kitchen = $event->get('kitchen', $this->kitchen);
+    }
+
+    public function emitEventsTo(EventStream $stream): void
+    {
         $stream->appendAll($this->events);
         $this->events = $stream;
     }
 
-    public function replay(EventStream $stream): void {
+    public function replay(EventStream $stream): void
+    {
         $this->id = null;
         $this->events = $stream;
 
         foreach ($stream->getIterator() as $event) {
             $this->on($event);
         }
+    }
+
+    private function record(StateChanged $event): void
+    {
+        $this->on($event);
+        $this->events->append($event);
     }
 }
 ```

@@ -1,6 +1,6 @@
 <?php
 
-namespace mad654\eventstore\Fixtures;
+namespace mad654\eventstore\example;
 
 
 use mad654\eventstore\Event;
@@ -15,7 +15,7 @@ use mad654\eventstore\MemoryEventStream\MemoryEventStream;
  *
  * TODO refactor to lighter example
  */
-class TestSubject implements EventStreamEmitter
+class LightSwitch implements EventStreamEmitter
 {
     /**
      * @var int
@@ -28,6 +28,11 @@ class TestSubject implements EventStreamEmitter
     private $id;
 
     /**
+     * @var string
+     */
+    private $kitchen;
+
+    /**
      * @var EventStream
      */
     public $events;
@@ -36,13 +41,38 @@ class TestSubject implements EventStreamEmitter
     {
         $this->id = $id;
         $this->events = new MemoryEventStream();
-        $this->events->append(new StateChanged(['id' => $id]));
+        $this->events->append(new StateChanged(['id' => $id, 'kitchen' => false]));
         $this->constructorInvocationCount++;
     }
 
     public function subjectId(): string
     {
         return $this->id;
+    }
+
+    public function isKitchenOn(): bool
+    {
+        return $this->kitchen;
+    }
+
+    public function switchKitchenOn()
+    {
+        if ($this->kitchen) return;
+        $event = new StateChanged(['kitchen' => true]);
+        $this->record($event);
+    }
+
+    public function switchKitchenOff()
+    {
+        if (!$this->kitchen) return;
+        $event = new StateChanged(['kitchen' => false]);
+        $this->record($event);
+    }
+
+    private function on(Event $event)
+    {
+        $this->id = $event->get('id', $this->id);
+        $this->kitchen = $event->get('kitchen', $this->kitchen);
     }
 
     public function emitEventsTo(EventStream $stream): void
@@ -63,18 +93,11 @@ class TestSubject implements EventStreamEmitter
         }
     }
 
-    private function on(Event $event)
+    /**
+     * @param StateChanged $event
+     */
+    private function record(StateChanged $event): void
     {
-        # TODO support path syntax: path.to.payload.element
-        # TODO document how to create new subject by example patient
-        if (isset($event->payload()['id'])) {
-            $this->id = $event->payload()['id'];
-        }
-    }
-
-    public function dummyEventAction($i)
-    {
-        $event = new StateChanged(['id' => $i]);
         $this->on($event);
         $this->events->append($event);
     }

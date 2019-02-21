@@ -4,9 +4,9 @@ namespace mad654\eventstore;
 
 
 use mad654\eventstore\EventStream\EventStreamFactory;
+use mad654\eventstore\example\LightSwitch;
 use mad654\eventstore\FileEventStream\FileEventStream;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
-use mad654\eventstore\Fixtures\TestSubject;
 use mad654\eventstore\TestCase\FileTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -36,7 +36,7 @@ class EventObjectStoreTest extends FileTestCase
             ->method('new')
             ->with('some-subject-id');
 
-        $subject = new TestSubject('some-subject-id');
+        $subject = new LightSwitch('some-subject-id');
 
         $this->instance()->attach($subject);
     }
@@ -51,7 +51,7 @@ class EventObjectStoreTest extends FileTestCase
             ->method('new')
             ->willReturn($stream);
 
-        $this->instance()->attach(new TestSubject('some-subject-id'));
+        $this->instance()->attach(new LightSwitch('some-subject-id'));
         $streamData = iterator_to_array($stream->getIterator());
 
         $this->assertInstanceOf(ObjectCreatedEvent::class, $streamData[0]);
@@ -67,7 +67,7 @@ class EventObjectStoreTest extends FileTestCase
             ->method('new')
             ->willReturn($stream);
 
-        $this->instance()->attach(new TestSubject('some-subject-id'));
+        $this->instance()->attach(new LightSwitch('some-subject-id'));
 
         $this->assertCount(2, iterator_to_array($stream->getIterator()));
     }
@@ -80,18 +80,18 @@ class EventObjectStoreTest extends FileTestCase
     public function attach_changesAfterAttach_trackedAutomatically()
     {
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
-        $expected = new TestSubject('initial-id');
+        $expected = new LightSwitch('initial-id');
         $store->attach($expected);
 
-        $expected->dummyEventAction(9);
+        $expected->switchKitchenOn();
 
         $acutal = $store->get('initial-id');
-        if (!$acutal instanceof TestSubject) {
+        if (!$acutal instanceof LightSwitch) {
             $this->fail("Actual instance of TestSubject");
         }
 
         $this->assertCount(3, $acutal->events);
-        $this->assertEquals(9, $acutal->subjectId());
+        $this->assertTrue($acutal->isKitchenOn());
     }
 
     /**
@@ -99,7 +99,7 @@ class EventObjectStoreTest extends FileTestCase
      */
     public function get_subjectIdKnown_returnsEqualSubjectWithoutCallingConstructor()
     {
-        $expected = new TestSubject('one');
+        $expected = new LightSwitch('one');
         $expected->constructorInvocationCount = 0;
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
         $store->attach($expected);
@@ -107,7 +107,7 @@ class EventObjectStoreTest extends FileTestCase
         $actual = $store->get('one');
 
         $expected->events = null;
-        if ($actual instanceof TestSubject) {
+        if ($actual instanceof LightSwitch) {
             $actual->events = null;
         }
 
@@ -131,21 +131,21 @@ class EventObjectStoreTest extends FileTestCase
     public function get_changesAfterLoad_trackedAutomatically()
     {
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
-        $store->attach(new TestSubject('initial-id'));
+        $store->attach(new LightSwitch('initial-id'));
         $expected = $store->get('initial-id');
-        if (!$expected instanceof TestSubject) {
+        if (!$expected instanceof LightSwitch) {
             $this->fail("Expected instance of TestSubject");
         }
 
-        $expected->dummyEventAction(9);
+        $expected->switchKitchenOn();
 
         $acutal = $store->get('initial-id');
-        if (!$acutal instanceof TestSubject) {
+        if (!$acutal instanceof LightSwitch) {
             $this->fail("Expected instance of TestSubject");
         }
 
         $this->assertCount(3, $acutal->events);
-        $this->assertEquals(9, $acutal->subjectId());
+        $this->assertTrue($acutal->isKitchenOn());
     }
 
     public function instance(FileEventStreamFactory $factory = null): EventObjectStore

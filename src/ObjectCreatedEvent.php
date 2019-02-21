@@ -3,9 +3,10 @@
 namespace mad654\eventstore;
 
 
+use mad654\eventstore\event\StateChanged;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 
-class ObjectCreatedEvent implements Event
+class ObjectCreatedEvent extends StateChanged implements Event
 {
     /**
      * @var string
@@ -18,6 +19,7 @@ class ObjectCreatedEvent implements Event
      */
     private function __construct(string $className)
     {
+        parent::__construct(['class_name' => $className]);
         $this->className = $className;
     }
 
@@ -25,12 +27,5 @@ class ObjectCreatedEvent implements Event
     public static function for(EventStreamEmitter $emitter): ObjectCreatedEvent
     {
         return new ObjectCreatedEvent(get_class($emitter));
-    }
-
-    public function payload(): array
-    {
-        return [
-            'class_name' => $this->className
-        ];
     }
 }
