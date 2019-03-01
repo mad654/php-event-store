@@ -51,7 +51,7 @@ class LightSwitch {
         return $this->kitchen;
     }
     
-	public function switchKitchenOn()
+    public function switchKitchenOn()
     {
         if ($this->kitchen === 'on') return;
         // do some stuff which does the hard work
