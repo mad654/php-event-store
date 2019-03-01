@@ -21,22 +21,6 @@ make test
 make test.watch
 ```
 
-## concepts
-
-### EventStream
-
-Ist eine Liste von Events.
-
-EventEmitter sind Objekte die über EventStream persistiert werden.
-
-Sobald ein EventEmitter dem ObjectEventStore mittels attach hinzugefügt
-wurde, werden alle aktuellen und alle neuen Events persistiert.
-
-Ob alle neuen Events persistiert werden, hängt von der Implementierung
-des Subjects ab.
-
-@TBD API die state changes über events super einfach macht
-
 ## motivation
 
 object relational mapping is hard, even its welcovered topic, you can only achive about 80% cases working: which?
@@ -156,59 +140,6 @@ class LightSwitch implements EventStreamEmitter
 So instead of changing your member variables directly, you will use events for this, like shown in `switchKitchenOn`
 
 
-
-### last but not least
-
-```php
-class Lighter {	
-    use ImutableDtoTrait;
-    
-    ...
-                                        
-    public function willFail() {
-        $this->light = 'off'; // throws ImutablePropertyException
-    }
-    
-    ...
-        
-}
-```
-
-
-
-### With transpiler this may be possible - will this work on child objects?
-
-```php
-evtsourced class Lighter {	
-    evtsourced private $id;
-    evtsourced private $light;
-    
-    evtsourced public function __construct(string $id) {
-        // EventBasedState::record will change its properties (on) + appends evt to stream
-        $this->id = $id;
-        $this->light = $light;
-        // at the end of each public function, all property changes are recorded as a event,
-        // with the function name as indent
-    }
-    
-	evtsourced public function switchLightOn()
-    {
-        if ($this->light === 'on') return;
-        // do some stuff which does the hard work
-        $this->light = 'off'
-    }
-    
-    evtsourced public function switchLightOff()
-    {
-        if ($this->light === 'off') return;
-         // do some stuff which does the hard work
-        $this->light = 'on'
-    }
-}
-```
-
-
-
 ### EventObjectStore
 
 ```php
@@ -233,7 +164,10 @@ By definition an EventObjectStore can only store and retrieve objects by id. Her
 
 ### Event
 
-immutable by definition
+In this example we use the StateChanged event, in production you should
+create subclasses of this to express more precisely what happened.
+
+In general events are immutable.
 
 ### Putting all pices together
 
@@ -281,3 +215,18 @@ echo $store->get('kitchen')->history($formatter);
 # 2018-12-03 18:10:00 | GenericEvent | Lighter  | off
 ```
 
+## concepts
+
+### EventStream
+
+Ist eine Liste von Events.
+
+EventEmitter sind Objekte die über EventStream persistiert werden.
+
+Sobald ein EventEmitter dem ObjectEventStore mittels attach hinzugefügt
+wurde, werden alle aktuellen und alle neuen Events persistiert.
+
+Ob alle neuen Events persistiert werden, hängt von der Implementierung
+des Subjects ab.
+
+@TBD API die state changes über events super einfach macht
