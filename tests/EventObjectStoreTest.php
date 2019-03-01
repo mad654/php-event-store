@@ -83,7 +83,7 @@ class EventObjectStoreTest extends FileTestCase
         $expected = new LightSwitch('initial-id');
         $store->attach($expected);
 
-        $expected->switchKitchenOn();
+        $expected->switchOn();
 
         $acutal = $store->get('initial-id');
         if (!$acutal instanceof LightSwitch) {
@@ -91,7 +91,7 @@ class EventObjectStoreTest extends FileTestCase
         }
 
         $this->assertCount(3, $acutal->events);
-        $this->assertTrue($acutal->isKitchenOn());
+        $this->assertTrue($acutal->isOn());
     }
 
     /**
@@ -137,7 +137,7 @@ class EventObjectStoreTest extends FileTestCase
             $this->fail("Expected instance of TestSubject");
         }
 
-        $expected->switchKitchenOn();
+        $expected->switchOn();
 
         $acutal = $store->get('initial-id');
         if (!$acutal instanceof LightSwitch) {
@@ -145,7 +145,7 @@ class EventObjectStoreTest extends FileTestCase
         }
 
         $this->assertCount(3, $acutal->events);
-        $this->assertTrue($acutal->isKitchenOn());
+        $this->assertTrue($acutal->isOn());
     }
 
     public function instance(FileEventStreamFactory $factory = null): EventObjectStore

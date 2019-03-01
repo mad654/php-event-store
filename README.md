@@ -90,6 +90,11 @@ class LightSwitch implements EventStreamEmitter
     use AutoTrackingEventStreamEmitterTrait;
 
     /**
+     * @var int
+     */
+    public $constructorInvocationCount = 0;
+
+    /**
      * @var string
      */
     private $id;
@@ -97,12 +102,12 @@ class LightSwitch implements EventStreamEmitter
     /**
      * @var string
      */
-    private $kitchen;
+    private $state;
 
     public function __construct(string $id)
     {
         $this->events = new MemoryEventStream();
-        $this->record(new StateChanged(['id' => $id, 'kitchen' => false]));
+        $this->record(new StateChanged(['id' => $id, 'state' => false]));
         $this->constructorInvocationCount++;
     }
 
@@ -111,27 +116,27 @@ class LightSwitch implements EventStreamEmitter
         return $this->id;
     }
 
-    public function isKitchenOn(): bool
+    public function isOn(): bool
     {
-        return $this->kitchen;
+        return $this->state;
     }
 
-    public function switchKitchenOn()
+    public function switchOn()
     {
-        if ($this->kitchen) return;
-        $this->record(new StateChanged(['kitchen' => true]));
+        if ($this->state) return;
+        $this->record(new StateChanged(['state' => true]));
     }
 
-    public function switchKitchenOff()
+    public function switchOff()
     {
-        if (!$this->kitchen) return;
-        $this->record(new StateChanged(['kitchen' => false]));
+        if (!$this->state) return;
+        $this->record(new StateChanged(['state' => false]));
     }
 
     private function on(Event $event)
     {
         $this->id = $event->get('id', $this->id);
-        $this->kitchen = $event->get('kitchen', $this->kitchen);
+        $this->state = $event->get('state', $this->state);
     }
 
 }
@@ -178,8 +183,8 @@ use mad654\eventstore\EventObjectStore;
 $factory = new FileEventStreamFactory("/tmp/eventstore-example");
 $store = new EventObjectStore($factory);
 
-$lighter = new Lighter('kitchen');
-$store->attach($lighter);
+$switch = new LightSwitch('kitchen');
+$store->attach($switch);
 ```
 
 
@@ -187,13 +192,13 @@ $store->attach($lighter);
 Some times later in an other request you want to switch on the light in the kitchen:
 
 ``` php
-$store->get('kitchen')->switchLightOn();
+$store->get('kitchen')->switchOn();
 ```
 
 And again later you will switch it off again:
 
 ```php
-$store->get('kitchen')->switchLightOff();
+$store->get('kitchen')->switchOff();
 ```
 
 

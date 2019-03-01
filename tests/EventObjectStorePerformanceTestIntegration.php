@@ -19,7 +19,7 @@ class EventObjectStorePerformanceTestIntegration extends FileTestCase
         $store->attach($subject);
 
         foreach (range(1, 10000) as $i) {
-            $subject->switchKitchenOn($i);
+            $subject->switchOn($i);
         }
 
 

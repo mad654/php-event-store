@@ -26,12 +26,12 @@ class LightSwitch implements EventStreamEmitter
     /**
      * @var string
      */
-    private $kitchen;
+    private $state;
 
     public function __construct(string $id)
     {
         $this->events = new MemoryEventStream();
-        $this->record(new StateChanged(['id' => $id, 'kitchen' => false]));
+        $this->record(new StateChanged(['id' => $id, 'state' => false]));
         $this->constructorInvocationCount++;
     }
 
@@ -40,27 +40,27 @@ class LightSwitch implements EventStreamEmitter
         return $this->id;
     }
 
-    public function isKitchenOn(): bool
+    public function isOn(): bool
     {
-        return $this->kitchen;
+        return $this->state;
     }
 
-    public function switchKitchenOn()
+    public function switchOn()
     {
-        if ($this->kitchen) return;
-        $this->record(new StateChanged(['kitchen' => true]));
+        if ($this->state) return;
+        $this->record(new StateChanged(['state' => true]));
     }
 
-    public function switchKitchenOff()
+    public function switchOff()
     {
-        if (!$this->kitchen) return;
-        $this->record(new StateChanged(['kitchen' => false]));
+        if (!$this->state) return;
+        $this->record(new StateChanged(['state' => false]));
     }
 
     private function on(Event $event)
     {
         $this->id = $event->get('id', $this->id);
-        $this->kitchen = $event->get('kitchen', $this->kitchen);
+        $this->state = $event->get('state', $this->state);
     }
 
 }
