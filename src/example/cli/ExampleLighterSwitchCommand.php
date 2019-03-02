@@ -18,7 +18,7 @@ class ExampleLighterSwitchCommand extends Command
         parent::configure();
         $this->addArgument("lighter-name", InputOption::VALUE_REQUIRED);
         $this->addOption("on", "1", InputOption::VALUE_NONE);
-        $this->addOption("off", "2", InputOption::VALUE_NONE);
+        $this->addOption("off", "0", InputOption::VALUE_NONE);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -47,7 +47,7 @@ class ExampleLighterSwitchCommand extends Command
             }
 
             if ($off) {
-                $switch->switchOn();
+                $switch->switchOff();
                 $output->writeln("Switched $name off");
                 return;
             }

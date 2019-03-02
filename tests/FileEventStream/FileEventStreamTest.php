@@ -74,15 +74,17 @@ class FileEventStreamTest extends FileTestCase
      */
     public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
     {
+        $event1 = new StateChanged(['name' => 'one']);
+        $event2 = new StateChanged(['name' => 'two']);
         $actual = $this->instance()
-            ->append(new StateChanged(['name' => 'one']))
-            ->append(new StateChanged(['name' => 'two']));
+            ->append($event1)
+            ->append($event2);
 
         $actual = iterator_to_array($actual->getIterator());
 
         $this->assertCount(2, $actual);
-        $this->assertEquals(new StateChanged(['name' => 'one']), $actual[0]);
-        $this->assertEquals(new StateChanged(['name' => 'two']), $actual[1]);
+        $this->assertEquals($event1, $actual[0]);
+        $this->assertEquals($event2, $actual[1]);
     }
 
     /**

@@ -19,6 +19,20 @@ class StateChangedTest extends TestCase
     /**
      * @test
      */
+    public function __construct_always_hasImmutableTimestamp()
+    {
+        $start = new \DateTimeImmutable();
+        $event = new StateChanged([]);
+
+        $actual = $event->timestamp();
+
+        $this->assertGreaterThan($start, $actual);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $actual);
+    }
+
+    /**
+     * @test
+     */
     public function payload_always_returnsArray()
     {
         $instance = new StateChanged(['foo' => 'bar']);

@@ -9,6 +9,8 @@ namespace mad654\eventstore;
  */
 interface Event
 {
+    public function timestamp(): \DateTimeImmutable;
+
     public function payload(): array;
 
     public function has(string $key): bool;

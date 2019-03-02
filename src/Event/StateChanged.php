@@ -8,6 +8,12 @@ use mad654\eventstore\Event;
 
 class StateChanged implements Event
 {
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    private $timestamp;
+
     /**
      * @var Data
      */
@@ -15,6 +21,16 @@ class StateChanged implements Event
 
     public function __construct(array $payload)
     {
+        try {
+            $this->timestamp = new \DateTimeImmutable();
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                "Could not create timestamp for event",
+                1,
+                $e
+            );
+        }
+
         $this->payload = new Data($payload);
     }
 
@@ -35,5 +51,10 @@ class StateChanged implements Event
         }
 
         return $this->payload->get($key);
+    }
+
+    public function timestamp(): \DateTimeImmutable
+    {
+        return $this->timestamp;
     }
 }
