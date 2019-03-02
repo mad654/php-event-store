@@ -210,8 +210,8 @@ And again ...
 And now you are wondering why you power bill is so expensive - let's take a look at the history:
 
 ```php
-$formatter = new CliEventStreamFormatter();
-echo $store->get('kitchen')->history($formatter);
+$renderer = new SymfonyOutputEventStreamRenderer();
+echo $store->get('kitchen')->history($renderer);
 
 # timestamp           | event_type   | property | new_state
 # 2018-12-01 18:10:00 | GenericEvent | Lighter  | on

@@ -10,6 +10,7 @@ trait AutoTrackingEventStreamEmitterTrait
 
     /**
      * @var EventStream
+     * FIXME: make me private
      */
     public $events;
 
@@ -38,5 +39,14 @@ trait AutoTrackingEventStreamEmitterTrait
     {
         $this->on($event);
         $this->events->append($event);
+    }
+
+    public function history(EventStreamRenderer $renderer): EventStreamRenderer
+    {
+        foreach ($this->events as $event) {
+            $renderer->renderEvent($event);
+        }
+
+        return $renderer;
     }
 }
