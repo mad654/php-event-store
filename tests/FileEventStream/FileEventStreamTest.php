@@ -5,7 +5,7 @@ namespace mad654\eventstore\FileEventStream;
 
 use Consolidation\Log\Logger;
 use mad654\eventstore\Event;
-use mad654\eventstore\event\StateChanged;
+use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventTraversable;
 use mad654\eventstore\TestCase\FileTestCase;

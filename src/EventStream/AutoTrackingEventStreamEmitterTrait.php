@@ -3,7 +3,7 @@
 namespace mad654\eventstore\EventStream;
 
 
-use mad654\eventstore\event\StateChanged;
+use mad654\eventstore\Event\StateChanged;
 
 trait AutoTrackingEventStreamEmitterTrait
 {

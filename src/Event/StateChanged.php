@@ -1,6 +1,6 @@
 <?php
 
-namespace mad654\eventstore\event;
+namespace mad654\eventstore\Event;
 
 
 use Dflydev\DotAccessData\Data;

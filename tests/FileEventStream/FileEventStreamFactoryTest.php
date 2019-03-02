@@ -3,7 +3,7 @@
 namespace mad654\eventstore\FileEventStream;
 
 
-use mad654\eventstore\event\StateChanged;
+use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStreamFactory;
 use mad654\eventstore\TestCase\FileTestCase;
 

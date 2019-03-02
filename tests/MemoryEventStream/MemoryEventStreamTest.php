@@ -4,7 +4,7 @@ namespace mad654\eventstore\MemoryEventStream;
 
 
 use mad654\eventstore\Event;
-use mad654\eventstore\event\StateChanged;
+use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 use PHPUnit\Framework\TestCase;
 
