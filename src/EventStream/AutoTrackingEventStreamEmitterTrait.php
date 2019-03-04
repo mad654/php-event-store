@@ -43,10 +43,7 @@ trait AutoTrackingEventStreamEmitterTrait
 
     public function history(EventStreamRenderer $renderer): EventStreamRenderer
     {
-        foreach ($this->events as $event) {
-            $renderer->renderEvent($event);
-        }
-
+        $renderer->render($this->events);
         return $renderer;
     }
 }

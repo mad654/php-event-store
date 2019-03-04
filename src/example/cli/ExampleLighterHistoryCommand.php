@@ -5,6 +5,7 @@ namespace mad654\eventstore\example\cli;
 
 use mad654\eventstore\Event;
 use mad654\eventstore\EventObjectStore;
+use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamRenderer;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
 use Symfony\Component\Console\Command\Command;
@@ -20,12 +21,17 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
      */
     private $history;
 
-    public function renderEvent(Event $event): void
+    public function render(EventStream $events): void
     {
-        if (!is_array($this->history)) {
-            $this->history = [['nr', 'timestamp', 'event_type', 'property', 'new_state']];
-        }
+        $this->history = [['nr', 'timestamp', 'event_type', 'property', 'new_state']];
 
+        foreach ($events as $event) {
+            $this->renderEvent($event);
+        }
+    }
+
+    private function renderEvent(Event $event): void
+    {
         try {
             $type = (new \ReflectionClass($event))->getShortName();
         } catch (\ReflectionException $reflectionException) {
@@ -70,6 +76,7 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
         throw new \RuntimeException("history $name needs refactoring");
     }
 
+
     private function print(SymfonyStyle $io): void
     {
         $io->table(
@@ -77,6 +84,4 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
             $this->history
         );
     }
-
-
 }

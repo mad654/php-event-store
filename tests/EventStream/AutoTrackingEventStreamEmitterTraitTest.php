@@ -13,13 +13,16 @@ class AutoTrackingEventStreamEmitterTraitTest extends TestCase
      * @test
      * @throws \ReflectionException
      */
-    public function history_always_callsRenderEventOnRenderer()
+    public function history_always_callsRenderOnRenderer()
     {
+        $subject = new LightSwitch('foo');
+
         /* @var EventStreamRenderer|MockObject $renderer */
         $renderer = $this->getMockForAbstractClass(EventStreamRenderer::class);
-        $renderer->expects($this->once())->method('renderEvent');
+        $renderer->expects($this->once())
+            ->method('render')
+            ->with($subject->events);
 
-        $subject = new LightSwitch('foo');
         $subject->history($renderer);
     }
 }
