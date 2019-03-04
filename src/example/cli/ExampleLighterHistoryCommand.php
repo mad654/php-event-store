@@ -67,7 +67,7 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
         $switch->history($this);
         $this->print(new SymfonyStyle($input, $output));
 
-        throw new \RuntimeException("history $name is not yet implemented");
+        throw new \RuntimeException("history $name needs refactoring");
     }
 
     private function print(SymfonyStyle $io): void
