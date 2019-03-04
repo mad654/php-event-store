@@ -4,7 +4,7 @@ namespace mad654\eventstore\example\cli;
 
 
 use mad654\eventstore\Event;
-use mad654\eventstore\EventObjectStore;
+use mad654\eventstore\EventSourcedObjectStore;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamRenderer;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
@@ -66,7 +66,7 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
         }
 
         $factory = new FileEventStreamFactory(ExampleLighterInitCommand::STREAM_STORAGE_PATH);
-        $store = new EventObjectStore($factory);
+        $store = new EventSourcedObjectStore($factory);
         $switch = $store->get($name);
 
         $this->history = null;

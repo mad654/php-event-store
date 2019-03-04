@@ -14,7 +14,7 @@ class EventObjectStorePerformanceTestIntegration extends FileTestCase
      */
     public function get_singleSubjectWith10000Events_loadsIn65ms()
     {
-        $store = new EventObjectStore(new FileEventStreamFactory($this->rootDirPath()));
+        $store = new EventSourcedObjectStore(new FileEventStreamFactory($this->rootDirPath()));
         $subject = new LightSwitch('foo');
         $store->attach($subject);
 
@@ -24,7 +24,7 @@ class EventObjectStorePerformanceTestIntegration extends FileTestCase
 
 
         $diff = take_time(function () {
-            $store = new EventObjectStore(new FileEventStreamFactory($this->rootDirPath()));
+            $store = new EventSourcedObjectStore(new FileEventStreamFactory($this->rootDirPath()));
             $store->get('foo');
         });
 

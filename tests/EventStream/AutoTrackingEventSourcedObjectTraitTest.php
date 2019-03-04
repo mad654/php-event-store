@@ -7,7 +7,7 @@ use mad654\eventstore\example\LightSwitch;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class AutoTrackingEventStreamEmitterTraitTest extends TestCase
+class AutoTrackingEventSourcedObjectTraitTest extends TestCase
 {
     /**
      * @test

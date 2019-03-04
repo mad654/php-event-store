@@ -5,7 +5,7 @@ namespace mad654\eventstore\EventStream;
 
 use mad654\eventstore\Event\StateChanged;
 
-trait AutoTrackingEventStreamEmitterTrait
+trait AutoTrackingEventSourcedObjectTrait
 {
 
     /**

@@ -148,13 +148,13 @@ class EventObjectStoreTest extends FileTestCase
         $this->assertTrue($acutal->isOn());
     }
 
-    public function instance(FileEventStreamFactory $factory = null): EventObjectStore
+    public function instance(FileEventStreamFactory $factory = null): EventSourcedObjectStore
     {
         if (is_null($factory)) {
             $factory = $this->streamFactory;
         }
 
-        return new EventObjectStore($factory);
+        return new EventSourcedObjectStore($factory);
     }
 
 }

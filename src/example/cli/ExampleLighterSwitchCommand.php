@@ -3,7 +3,7 @@
 namespace mad654\eventstore\example\cli;
 
 
-use mad654\eventstore\EventObjectStore;
+use mad654\eventstore\EventSourcedObjectStore;
 use mad654\eventstore\example\LightSwitch;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
 use Symfony\Component\Console\Command\Command;
@@ -36,7 +36,7 @@ class ExampleLighterSwitchCommand extends Command
         }
 
         $factory = new FileEventStreamFactory(ExampleLighterInitCommand::STREAM_STORAGE_PATH);
-        $store = new EventObjectStore($factory);
+        $store = new EventSourcedObjectStore($factory);
         $switch = $store->get($name);
 
         if ($switch instanceof LightSwitch) {

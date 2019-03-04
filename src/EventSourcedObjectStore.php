@@ -13,7 +13,7 @@ use mad654\eventstore\EventStream\EventStreamFactory;
  * their events to given stream factory
  *
  */
-class EventObjectStore
+class EventSourcedObjectStore
 {
     /**
      * @var EventStreamFactory
@@ -37,7 +37,7 @@ class EventObjectStore
         $emitter->emitEventsTo($stream);
     }
 
-    public function get(string $key): EventStreamEmitter
+    public function get(string $key): EventSourcedObject
     {
         try {
             $stream = $this->streamFactory->get($key);
@@ -51,7 +51,7 @@ class EventObjectStore
         }
     }
 
-    private function toEventStreamEmitter(EventStream $stream): EventStreamEmitter
+    private function toEventStreamEmitter(EventStream $stream): EventSourcedObject
     {
         $class = $this->extractSubjectClassName($stream);
 
@@ -82,18 +82,18 @@ class EventObjectStore
     /**
      * @param EventStream $stream
      * @param string $subjectType
-     * @return EventStreamEmitter
+     * @return EventSourcedObject
      * @throws \ReflectionException
      */
-    private function recoverFrom(EventStream $stream, string $subjectType): EventStreamEmitter
+    private function recoverFrom(EventStream $stream, string $subjectType): EventSourcedObject
     {
         $class = new \ReflectionClass($subjectType);
         $subject = $class->newInstanceWithoutConstructor();
 
-        if (!$subject instanceof EventStreamEmitter) {
+        if (!$subject instanceof EventSourcedObject) {
             throw new \RuntimeException(sprintf(
                 'Invalid subject type in stream - it does not implement: %s',
-                EventStreamEmitter::class
+                EventSourcedObject::class
             ));
         }
 
