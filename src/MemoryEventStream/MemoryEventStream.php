@@ -7,7 +7,7 @@ use mad654\eventstore\Event;
 use mad654\eventstore\EventStream\EventStream;
 use Traversable;
 
-class MemoryEventStream implements EventStream
+final class MemoryEventStream implements EventStream
 {
     /**
      * @var array
@@ -20,6 +20,14 @@ class MemoryEventStream implements EventStream
     public function __construct()
     {
         $this->data = [];
+    }
+
+    public static function fromArray(array $events): self
+    {
+        $instance = new self();
+        $instance->data = $events;
+
+        return $instance;
     }
 
     /**

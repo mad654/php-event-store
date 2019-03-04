@@ -23,6 +23,8 @@ class MemoryEventStreamTest extends TestCase
         return new MemoryEventStream();
     }
 
+    // FIXME: Add tests for fromArray asserting input types
+
     /**
      * @test
      */
