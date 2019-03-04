@@ -8,4 +8,6 @@ use mad654\eventstore\EventStream\EventStream;
 interface EventStreamConsumer
 {
     public function replay(EventStream $stream): void;
+
+    public function on(Event $event): void;
 }

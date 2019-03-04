@@ -8,6 +8,7 @@ use mad654\eventstore\EventSourcedObjectStore;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamRenderer;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
+use mad654\eventstore\StateProjector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,29 +22,15 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
      */
     private $history;
 
+    /**
+     * @var StateProjector
+     */
+    private $projector;
+
     public function render(EventStream $events): void
     {
-        $this->history = [['nr', 'timestamp', 'event_type', 'property', 'new_state']];
+        $this->history = [['nr', 'timestamp', 'event_type', 'id', 'property', 'new_state']];
 
-        // FIXME: create IntermediateStateProjector
-        $projector = new IntermediateStateProjector();
-        $projector->replay($events);
-        foreach ($projector->getIterator() as $state) {
-            $new = [
-                'nr' => $counter++,
-                'timestamp' => $state['last_event']['timestamp'],
-                'type' => $state['last_event']['type']
-            ];
-
-            foreach ($state['properties'] as $key => $value) {
-                $new[$key] = $value;
-            }
-
-            $this->history[] = $new;
-        };
-
-        // FIXME: flatten properties of
-        // ['id' => '...', 'timestamp' => ' ... ', 'type' => ' ... ', 'properties' => [ ... ]]
         foreach ($events as $event) {
             $this->renderEvent($event);
         }
@@ -51,23 +38,51 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
 
     private function renderEvent(Event $event): void
     {
+        if (is_null($this->projector)) {
+            $this->projector = new StateProjector();
+        }
+
+        /*
+         * TODO: Limit print to last 3 Events
+         *
+         * FIXME: refactor to projector as $data['__meta']['timestamp']
+         * FIXME: refactor to projector as $data['__meta']['event_type']
+         * FIXME: refactor to projector as $data['__meta']['id']
+         * FIXME: refactor to projector as $data['__meta']['object_class']
         try {
             $type = (new \ReflectionClass($event))->getShortName();
         } catch (\ReflectionException $reflectionException) {
             $type = 'UNKNOWN';
         }
+        */
 
-        $value = $event->get('state', null);
-        if ($value === true) $value = 'on';
-        if ($value === false) $value = 'off';
+        $this->projector->on($event);
+        $data = $this->projector->toArray();
 
-        $this->history[] = [
+        $entry = [
             count($this->history),
             $event->timestamp()->format(DATE_ATOM),
-            $type,
-            'state',
-            $value,
+            $data['__meta']['type'],
+            $data['__meta']['id']
         ];
+
+        $id = null;
+
+        foreach ($data as $key => $value) {
+            if ($key == 'class_name') continue;
+            if ($key == 'id') {
+                $id = $value;
+                continue;
+            }
+
+            $value = ($value === true) ? 'on' : $value;
+            $value = ($value === false) ? 'off' : $value;
+            $entry[] = "$id";
+            $entry[] = "$key";
+            $entry[] = $value;
+        }
+
+        $this->history[] = $entry;
     }
 
     protected function configure()

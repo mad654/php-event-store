@@ -57,7 +57,7 @@ class LightSwitch implements EventSourcedObject
         $this->record(new StateChanged(['state' => false]));
     }
 
-    private function on(Event $event)
+    public function on(Event $event): void
     {
         $this->id = $event->get('id', $this->id);
         $this->state = $event->get('state', $this->state);
