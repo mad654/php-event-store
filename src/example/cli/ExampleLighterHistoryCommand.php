@@ -25,6 +25,25 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
     {
         $this->history = [['nr', 'timestamp', 'event_type', 'property', 'new_state']];
 
+        // FIXME: create IntermediateStateProjector
+        $projector = new IntermediateStateProjector();
+        $projector->replay($events);
+        foreach ($projector->getIterator() as $state) {
+            $new = [
+                'nr' => $counter++,
+                'timestamp' => $state['last_event']['timestamp'],
+                'type' => $state['last_event']['type']
+            ];
+
+            foreach ($state['properties'] as $key => $value) {
+                $new[$key] = $value;
+            }
+
+            $this->history[] = $new;
+        };
+
+        // FIXME: flatten properties of
+        // ['id' => '...', 'timestamp' => ' ... ', 'type' => ' ... ', 'properties' => [ ... ]]
         foreach ($events as $event) {
             $this->renderEvent($event);
         }

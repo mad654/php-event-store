@@ -7,7 +7,7 @@ use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 use PHPUnit\Framework\TestCase;
 
-class StateChangedProjectorTest extends TestCase
+class FinalStateProjectorTest extends TestCase
 {
     /**
      * @test
@@ -66,11 +66,11 @@ class StateChangedProjectorTest extends TestCase
 
     /**
      * @param array $events
-     * @return StateChangedProjector
+     * @return FinalStateProjector
      */
-    private function instance(array $events = []): StateChangedProjector
+    private function instance(array $events = []): FinalStateProjector
     {
-        $result = new StateChangedProjector();
+        $result = new FinalStateProjector();
         $result->replay(MemoryEventStream::fromArray($events));
         return $result;
     }

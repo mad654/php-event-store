@@ -6,7 +6,15 @@ namespace mad654\eventstore;
 use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 
-class StateChangedProjector implements EventStreamConsumer
+/**
+ *
+ * Calculates last state of all named payload properties which it
+ * finds in all StateChanged events in the given eventstream
+ *
+ * Class FinalStateProjector
+ * @package mad654\eventstore
+ */
+class FinalStateProjector implements EventStreamConsumer
 {
     private $projection;
 
