@@ -43,6 +43,9 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
         }
 
         /*
+         * TODO: change example to 2 properties?
+         * TODO: Print Line per Property instead of per Event to keep max 80 width
+         * TODO: Add table separator between events
          * TODO: Limit print to last 3 Events
          *
          * FIXME: refactor to projector as $data['__meta']['timestamp']
@@ -50,8 +53,9 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
          * FIXME: refactor to projector as $data['__meta']['id']
          * FIXME: refactor to projector as $data['__meta']['class_name']
          *
+         * FIXME: implement like this + make this default without counter
          * $this->projector->on($event);
-         * $this->history = $this->projector->toArray(function(Event $event, $data) {
+         * $this->history[] = $this->projector->getIterator($map = function(Event $event, $data) {
          *      $entry = [
          *          count($this->history);
          *          $event->timestamp()->format(DATE_ATOM),
