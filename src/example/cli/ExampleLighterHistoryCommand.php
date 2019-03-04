@@ -48,7 +48,19 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
          * FIXME: refactor to projector as $data['__meta']['timestamp']
          * FIXME: refactor to projector as $data['__meta']['event_type']
          * FIXME: refactor to projector as $data['__meta']['id']
-         * FIXME: refactor to projector as $data['__meta']['object_class']
+         * FIXME: refactor to projector as $data['__meta']['class_name']
+         *
+         * $this->projector->on($event);
+         * $this->history = $this->projector->toArray(function(Event $event, $data) {
+         *      $entry = [
+         *          count($this->history);
+         *          $event->timestamp()->format(DATE_ATOM),
+         *          $data['__meta']['type'],
+         *          $data['__meta']['id'],
+         *      ];
+         *      unset($data['_meta'];
+         *      return array_merge($entry, $data);
+         * });
         try {
             $type = (new \ReflectionClass($event))->getShortName();
         } catch (\ReflectionException $reflectionException) {
