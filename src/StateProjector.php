@@ -98,11 +98,11 @@ class StateProjector implements EventStreamConsumer
     {
         if ($event instanceof ObjectCreatedEvent) {
             $this->subjectType = $event->get('class_name');
+            $this->subjectId = $event->subjectId();
             return;
         }
 
         $this->lastEventTimestamp = $event->timestamp();
-        $this->subjectId = $event->subjectId();
 
         try {
             $this->lastEventType = (new \ReflectionClass($event))->getShortName();
@@ -118,17 +118,20 @@ class StateProjector implements EventStreamConsumer
     public function toArray(): array
     {
         $result = $this->projection();
-        $result['__meta'] = [];
         $formated = '';
 
         if (!is_null($this->lastEventTimestamp())) {
             $formated = $this->lastEventTimestamp()->format(DATE_ATOM);
         }
 
-        $result['__meta']['timestamp'] = $formated;
-        $result['__meta']['type'] = $this->lastEventType();
-        $result['__meta']['subject']['id'] = $this->subjectId();
-        $result['__meta']['subject']['type'] = $this->subjectType();
+        $result['__meta'] = [
+            'timestamp' => $formated,
+            'type' => $this->lastEventType(),
+            'subject' => [
+                'id' => $this->subjectId(),
+                'type' => $this->subjectType()
+            ]
+        ];
 
         return $result;
     }
