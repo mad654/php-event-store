@@ -107,7 +107,7 @@ class StateProjector implements EventStreamConsumer
         try {
             $this->lastEventType = (new \ReflectionClass($event))->getShortName();
         } catch (\ReflectionException $reflectionException) {
-            $this->lastEventType = 'UNKNOWN';
+            $this->lastEventType = null;
         }
 
         foreach ($event->payload() as $key => $value) {
