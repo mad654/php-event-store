@@ -10,7 +10,7 @@ use mad654\eventstore\FileEventStream\FileEventStreamFactory;
 use mad654\eventstore\TestCase\FileTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class EventObjectStoreTest extends FileTestCase
+class EventSourcedObjectStoreTest extends FileTestCase
 {
     /**
      * @var EventStreamFactory|MockObject
