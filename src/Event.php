@@ -16,4 +16,6 @@ interface Event
     public function has(string $key): bool;
 
     public function get(string $key, $default = null);
+
+    public function subjectId(): string;
 }

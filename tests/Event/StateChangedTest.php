@@ -13,7 +13,7 @@ class StateChangedTest extends TestCase
      */
     public function __construct_always_returnsInstanceOfEvent()
     {
-        $this->assertInstanceOf(Event::class, new StateChanged([]));
+        $this->assertInstanceOf(Event::class, new StateChanged('some-id', []));
     }
 
     /**
@@ -22,7 +22,7 @@ class StateChangedTest extends TestCase
     public function __construct_always_hasImmutableTimestamp()
     {
         $start = new \DateTimeImmutable();
-        $event = new StateChanged([]);
+        $event = new StateChanged('some-id', []);
 
         $actual = $event->timestamp();
 
@@ -35,7 +35,7 @@ class StateChangedTest extends TestCase
      */
     public function payload_always_returnsArray()
     {
-        $instance = new StateChanged(['foo' => 'bar']);
+        $instance = new StateChanged('some-id', ['foo' => 'bar']);
         $this->assertSame(['foo' => 'bar'], $instance->payload());
     }
 
@@ -44,7 +44,7 @@ class StateChangedTest extends TestCase
      */
     public function has_always_returnsFalse()
     {
-        $instance = new StateChanged([]);
+        $instance = new StateChanged('some-id', []);
         $this->assertFalse($instance->has('foo'));
     }
 
@@ -53,7 +53,7 @@ class StateChangedTest extends TestCase
      */
     public function has_keyExists_returnsTrue()
     {
-        $instance = new StateChanged(['foo' => 'bar']);
+        $instance = new StateChanged('some-id', ['foo' => 'bar']);
         $this->assertTrue($instance->has('foo'));
     }
 
@@ -62,7 +62,7 @@ class StateChangedTest extends TestCase
      */
     public function has_pathMatchNestedArray_returnsTrue()
     {
-        $instance = new StateChanged(['foo' => ['bar' => 'foobar']]);
+        $instance = new StateChanged('some-id', ['foo' => ['bar' => 'foobar']]);
         $this->assertTrue($instance->has('foo.bar'));
     }
 
@@ -71,7 +71,7 @@ class StateChangedTest extends TestCase
      */
     public function get_always_returnsNull()
     {
-        $instance = new StateChanged([]);
+        $instance = new StateChanged('some-id', []);
         $this->assertNull($instance->get('foo'));
     }
 
@@ -80,7 +80,7 @@ class StateChangedTest extends TestCase
      */
     public function get_withDefaultKeyMissing_returnsDefault()
     {
-        $instance = new StateChanged([]);
+        $instance = new StateChanged('some-id', []);
         $this->assertSame('bar', $instance->get('foo', 'bar'));
     }
 
@@ -89,7 +89,7 @@ class StateChangedTest extends TestCase
      */
     public function get_keyExists_returnsValue()
     {
-        $instance = new StateChanged(['foo' => 'bar']);
+        $instance = new StateChanged('some-id', ['foo' => 'bar']);
         $this->assertSame('bar', $instance->get('foo'));
     }
 
@@ -98,7 +98,7 @@ class StateChangedTest extends TestCase
      */
     public function get_pathMatchNestedArray_returnsValue()
     {
-        $instance = new StateChanged(['foo' => ['bar' => 'foobar']]);
+        $instance = new StateChanged('some-id', ['foo' => ['bar' => 'foobar']]);
         $this->assertSame('foobar', $instance->get('foo.bar'));
     }
 }

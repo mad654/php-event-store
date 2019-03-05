@@ -31,7 +31,7 @@ class MemoryEventStreamTest extends TestCase
     public function getIterator_always_returnsEvents()
     {
         $actual = $this->instance()
-            ->append(new StateChanged(['name' => 'one']));
+            ->append(new StateChanged('some-id', ['name' => 'one']));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -45,8 +45,8 @@ class MemoryEventStreamTest extends TestCase
      */
     public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
     {
-        $event1 = new StateChanged(['name' => 'one']);
-        $event2 = new StateChanged(['name' => 'two']);
+        $event1 = new StateChanged('some-id', ['name' => 'one']);
+        $event2 = new StateChanged('some-id', ['name' => 'two']);
         $actual = $this->instance()
             ->append($event1)
             ->append($event2);
@@ -64,9 +64,9 @@ class MemoryEventStreamTest extends TestCase
     public function importFrom_bothOneElement_hasTwoElements()
     {
         $stream1 = $this->instance();
-        $stream1->append(new StateChanged(['name' => 'one']));
+        $stream1->append(new StateChanged('some-id', ['name' => 'one']));
         $stream2 = $this->instance();
-        $stream2->append(new StateChanged(['name' => 'two']));
+        $stream2->append(new StateChanged('some-id', ['name' => 'two']));
 
         $stream1->appendAll($stream2);
 

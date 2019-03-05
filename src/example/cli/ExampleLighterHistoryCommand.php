@@ -3,7 +3,6 @@
 namespace mad654\eventstore\example\cli;
 
 
-use mad654\eventstore\Event;
 use mad654\eventstore\EventSourcedObjectStore;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventStreamRenderer;
@@ -27,78 +26,59 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
      */
     private $projector;
 
+    /*
+     * TODO: change example to 2 properties?
+
+     * TODO: Limit print to last 3 Events
+     *
+     * FIXME: implement like this + make this default without counter
+     * $this->projector->on($event);
+     * $this->history[] = $this->projector->getIterator($map = function(Event $event, $data) {
+     *      $entry = [
+     *          count($this->history);
+     *          $event->timestamp()->format(DATE_ATOM),
+     *          $data['__meta']['type'],
+     *          $data['__meta']['id'],
+     *      ];
+     *      unset($data['_meta'];
+     *      return array_merge($entry, $data);
+     * });
+    try {
+        $type = (new \ReflectionClass($event))->getShortName();
+    } catch (\ReflectionException $reflectionException) {
+        $type = 'UNKNOWN';
+    }
+    */
+
     public function render(EventStream $events): void
     {
+        // TODO: Print Line per Property instead of per Event to keep max 80 width
+        // TODO: Add table separator between events
+
         $this->history = [['nr', 'timestamp', 'event_type', 'id', 'property', 'new_state']];
+        $this->projector = new StateProjector();
+        $this->projector->replay($events);
+        // FIXME: $data->meta->timestamp,
+        // FIXME: $data->meta->type,
+        // FIXME: $data->meta->subject->id,
+        // FIXME: $data->meta->subject->type,
+        // FIXME: $data->state,
+        foreach (StateProjector::intermediateIterator($events) as $data) {
+            $entry = [
+                count($this->history),
+                $data['__meta']['timestamp'],
+                $data['__meta']['type'],
+                $data['__meta']['subject']['id'],
+            ];
 
-        foreach ($events as $event) {
-            $this->renderEvent($event);
-        }
-    }
-
-    private function renderEvent(Event $event): void
-    {
-        if (is_null($this->projector)) {
-            $this->projector = new StateProjector();
-        }
-
-        /*
-         * TODO: change example to 2 properties?
-         * TODO: Print Line per Property instead of per Event to keep max 80 width
-         * TODO: Add table separator between events
-         * TODO: Limit print to last 3 Events
-         *
-         * FIXME: refactor to projector as $data['__meta']['timestamp']
-         * FIXME: refactor to projector as $data['__meta']['event_type']
-         * FIXME: refactor to projector as $data['__meta']['id']
-         * FIXME: refactor to projector as $data['__meta']['class_name']
-         *
-         * FIXME: implement like this + make this default without counter
-         * $this->projector->on($event);
-         * $this->history[] = $this->projector->getIterator($map = function(Event $event, $data) {
-         *      $entry = [
-         *          count($this->history);
-         *          $event->timestamp()->format(DATE_ATOM),
-         *          $data['__meta']['type'],
-         *          $data['__meta']['id'],
-         *      ];
-         *      unset($data['_meta'];
-         *      return array_merge($entry, $data);
-         * });
-        try {
-            $type = (new \ReflectionClass($event))->getShortName();
-        } catch (\ReflectionException $reflectionException) {
-            $type = 'UNKNOWN';
-        }
-        */
-
-        $this->projector->on($event);
-        $data = $this->projector->toArray();
-
-        $entry = [
-            count($this->history),
-            $event->timestamp()->format(DATE_ATOM),
-            $data['__meta']['type'],
-            $data['__meta']['id']
-        ];
-
-        $id = null;
-
-        foreach ($data as $key => $value) {
-            if ($key == 'class_name') continue;
-            if ($key == 'id') {
-                $id = $value;
-                continue;
+            unset($data['__meta']);
+            foreach ($data as $key => $value) {
+                $entry[] = $key;
+                $entry[] = $value;
             }
 
-            $value = ($value === true) ? 'on' : $value;
-            $value = ($value === false) ? 'off' : $value;
-            $entry[] = "$id";
-            $entry[] = "$key";
-            $entry[] = $value;
+            $this->history[] = $entry;
         }
-
-        $this->history[] = $entry;
     }
 
     protected function configure()

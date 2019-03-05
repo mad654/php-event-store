@@ -31,7 +31,7 @@ class LightSwitch implements EventSourcedObject
     public function __construct(string $id)
     {
         $this->events = new MemoryEventStream();
-        $this->record(new StateChanged(['id' => $id, 'state' => false]));
+        $this->record(new StateChanged($id, ['state' => false]));
         $this->constructorInvocationCount++;
     }
 
@@ -48,18 +48,18 @@ class LightSwitch implements EventSourcedObject
     public function switchOn()
     {
         if ($this->state) return;
-        $this->record(new StateChanged(['state' => true]));
+        $this->record(new StateChanged($this->id, ['state' => true]));
     }
 
     public function switchOff()
     {
         if (!$this->state) return;
-        $this->record(new StateChanged(['state' => false]));
+        $this->record(new StateChanged($this->id, ['state' => false]));
     }
 
     public function on(Event $event): void
     {
-        $this->id = $event->get('id', $this->id);
+        $this->id = $event->subjectId();
         $this->state = $event->get('state', $this->state);
     }
 

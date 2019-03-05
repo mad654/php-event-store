@@ -107,7 +107,7 @@ class FileEventStreamFactoryTest extends FileTestCase
     {
         $factory = $this->instance();
         $expected = $factory->new('some-id')
-            ->append(new StateChanged(['name' => 'one']));
+            ->append(new StateChanged('some-id', ['name' => 'one']));
 
         $actual = $factory->get('some-id');
 
@@ -130,8 +130,8 @@ class FileEventStreamFactoryTest extends FileTestCase
     public function get_newFactoryInstance_returnsStreamInstanceWithEqualEvents()
     {
         $expected = $this->instance()->new('some-id')
-            ->append(new StateChanged(['name' => 'one']))
-            ->append(new StateChanged(['name' => 'two']));
+            ->append(new StateChanged('some-id', ['name' => 'one']))
+            ->append(new StateChanged('some-id', ['name' => 'two']));
 
         $actual = $this->instance()->get('some-id');
 

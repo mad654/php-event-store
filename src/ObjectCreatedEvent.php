@@ -15,17 +15,19 @@ class ObjectCreatedEvent extends StateChanged implements Event
 
     /**
      * ObjectCreatedEvent constructor.
+     * @param string $id
      * @param string $className
      */
-    private function __construct(string $className)
+    private function __construct(string $id, string $className)
     {
-        parent::__construct(['class_name' => $className]);
+        parent::__construct($id, ['class_name' => $className]);
         $this->className = $className;
+
     }
 
 
     public static function for(EventStreamEmitter $emitter): ObjectCreatedEvent
     {
-        return new ObjectCreatedEvent(get_class($emitter));
+        return new ObjectCreatedEvent($emitter->subjectId(), get_class($emitter));
     }
 }

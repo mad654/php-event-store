@@ -8,7 +8,6 @@ use mad654\eventstore\Event;
 
 class StateChanged implements Event
 {
-
     /**
      * @var \DateTimeImmutable
      */
@@ -19,7 +18,13 @@ class StateChanged implements Event
      */
     private $payload;
 
-    public function __construct(array $payload)
+    /**
+     * @var string
+     * @TODO refactor to ID Object
+     */
+    private $subjectId;
+
+    public function __construct(string $subjectId, array $payload)
     {
         try {
             $this->timestamp = new \DateTimeImmutable();
@@ -32,6 +37,7 @@ class StateChanged implements Event
         }
 
         $this->payload = new Data($payload);
+        $this->subjectId = $subjectId;
     }
 
     public function payload(): array
@@ -56,5 +62,10 @@ class StateChanged implements Event
     public function timestamp(): \DateTimeImmutable
     {
         return $this->timestamp;
+    }
+
+    public function subjectId(): string
+    {
+        return $this->subjectId;
     }
 }

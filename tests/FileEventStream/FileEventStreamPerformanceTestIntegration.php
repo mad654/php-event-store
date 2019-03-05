@@ -18,7 +18,7 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
         $stream = $this->newInstance();
 
         foreach (range(1, 10000) as $iteration) {
-            $stream->append(new StateChanged(['id' => $iteration]));
+            $stream->append(new StateChanged('some-id', ['id' => $iteration]));
         }
 
         $actual = $this->loadInstance();
