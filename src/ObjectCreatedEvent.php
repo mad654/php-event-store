@@ -6,13 +6,14 @@ namespace mad654\eventstore;
 use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStreamEmitter;
 
+/**
+ * Class ObjectCreatedEvent
+ * @package mad654\eventstore
+ *
+ * FIXME Test if we loose timestamp after deserialisiatio
+ */
 class ObjectCreatedEvent extends StateChanged implements Event
 {
-    /**
-     * @var string
-     */
-    private $className;
-
     /**
      * ObjectCreatedEvent constructor.
      * @param string $id
@@ -21,8 +22,6 @@ class ObjectCreatedEvent extends StateChanged implements Event
     private function __construct(string $id, string $className)
     {
         parent::__construct(StringSubjectId::fromString($id), ['class_name' => $className]);
-        $this->className = $className;
-
     }
 
 
