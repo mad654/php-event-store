@@ -8,6 +8,7 @@ use mad654\eventstore\Event;
 use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStream;
 use mad654\eventstore\EventStream\EventTraversable;
+use mad654\eventstore\StringSubjectId;
 use mad654\eventstore\TestCase\FileTestCase;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -60,7 +61,7 @@ class FileEventStreamTest extends FileTestCase
     public function getIterator_always_returnsEvents()
     {
         $actual = $this->instance()
-            ->append(new StateChanged('some-id', ['name' => 'one']));
+            ->append(new StateChanged(StringSubjectId::fromString('some-id'), ['name' => 'one']));
 
         $actual = iterator_to_array($actual->getIterator());
 
@@ -74,8 +75,9 @@ class FileEventStreamTest extends FileTestCase
      */
     public function getIterator_twoElements_returnsIteratorWithEqualTwoElements()
     {
-        $event1 = new StateChanged('some-id', ['name' => 'one']);
-        $event2 = new StateChanged('some-id', ['name' => 'two']);
+        $subjectId = StringSubjectId::fromString('some-id');
+        $event1 = new StateChanged($subjectId, ['name' => 'one']);
+        $event2 = new StateChanged($subjectId, ['name' => 'two']);
         $actual = $this->instance()
             ->append($event1)
             ->append($event2);
@@ -108,10 +110,12 @@ class FileEventStreamTest extends FileTestCase
      */
     public function importFrom_bothOneElement_hasTwoElements()
     {
+        $subjectId = StringSubjectId::fromString('some-id');
+
         $stream1 = $this->instance('one');
-        $stream1->append(new StateChanged('some-id', ['name' => 'one']));
+        $stream1->append(new StateChanged($subjectId, ['name' => 'one']));
         $stream2 = $this->instance('two');
-        $stream2->append(new StateChanged('some-id', ['name' => 'two']));
+        $stream2->append(new StateChanged($subjectId, ['name' => 'two']));
 
         $stream1->appendAll($stream2);
 
@@ -123,12 +127,13 @@ class FileEventStreamTest extends FileTestCase
      */
     public function sut_always_persistsAddedEvents()
     {
+        $subjectId = StringSubjectId::fromString('some-id');
         $expected = $this->instance();
-        $expected->append(new StateChanged('some-id', ['name' => 'one']));
+        $expected->append(new StateChanged($subjectId, ['name' => 'one']));
         unset($expected);
 
         $expected = $this->loadInstance();
-        $expected->append(new StateChanged('some-id', ['name' => 'two']));
+        $expected->append(new StateChanged($subjectId, ['name' => 'two']));
 
         $actual = $this->loadInstance();
 

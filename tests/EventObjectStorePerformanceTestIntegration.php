@@ -15,7 +15,7 @@ class EventObjectStorePerformanceTestIntegration extends FileTestCase
     public function get_singleSubjectWith10000Events_loadsIn65ms()
     {
         $store = new EventSourcedObjectStore(new FileEventStreamFactory($this->rootDirPath()));
-        $subject = new LightSwitch('foo');
+        $subject = new LightSwitch(StringSubjectId::fromString('foo'));
         $store->attach($subject);
 
         foreach (range(1, 10000) as $i) {

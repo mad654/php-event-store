@@ -6,6 +6,7 @@ namespace mad654\eventstore\example\cli;
 use mad654\eventstore\EventSourcedObjectStore;
 use mad654\eventstore\example\LightSwitch;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
+use mad654\eventstore\StringSubjectId;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,7 +33,7 @@ class ExampleLighterInitCommand extends Command
         $factory = new FileEventStreamFactory(self::STREAM_STORAGE_PATH);
         $store = new EventSourcedObjectStore($factory);
 
-        $switch = new LightSwitch($name);
+        $switch = new LightSwitch(StringSubjectId::fromString($name));
         $store->attach($switch);
 
         $output->writeln("$name switch initialised");

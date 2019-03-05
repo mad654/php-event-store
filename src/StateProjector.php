@@ -38,7 +38,7 @@ class StateProjector implements EventStreamConsumer
     private $lastEventType;
 
     /**
-     * @var string
+     * @var SubjectId
      */
     private $subjectId;
 
@@ -146,7 +146,7 @@ class StateProjector implements EventStreamConsumer
         return $this->lastEventType;
     }
 
-    public function subjectId(): ?string
+    public function subjectId(): ?SubjectId
     {
         return $this->subjectId;
     }

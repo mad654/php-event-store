@@ -46,7 +46,7 @@ class StateProjectorTest extends TestCase
     public function toArray_eventWithOneProperty_returnsArrayWithOneProperty()
     {
         $events = [
-            new StateChanged('some-id', ['foo' => 'bar'])
+            new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar'])
         ];
 
         $actual = $this->instance($events)->toArray();
@@ -61,7 +61,7 @@ class StateProjectorTest extends TestCase
     public function toArray_eventWithTwoProperties_returnsArrayWithTwoProperties()
     {
         $events = [
-            new StateChanged('some-id', ['foo' => 'bar', 'bar' => 'foobar'])
+            new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar', 'bar' => 'foobar'])
         ];
 
         $actual = $this->instance($events)->toArray();
@@ -75,9 +75,10 @@ class StateProjectorTest extends TestCase
      */
     public function toArray_twoEvents_returnsArrayWithUpdatedProperty()
     {
+        $id = StringSubjectId::fromString('some-id');
         $events = [
-            new StateChanged('some-id', ['foo' => 'bar']),
-            new StateChanged('some-id', ['foo' => 'baz'])
+            new StateChanged($id, ['foo' => 'bar']),
+            new StateChanged($id, ['foo' => 'baz'])
         ];
 
         $actual = $this->instance($events)->toArray();
@@ -104,9 +105,10 @@ class StateProjectorTest extends TestCase
      */
     public function intermediateIterator_oneEventOneProperty_returnsOneArrayOneProperty()
     {
+        $subjectId = StringSubjectId::fromString('some-id');
         $events = [
-            ObjectCreatedEvent::for(new LightSwitch('some-id')),
-            new StateChanged('some-id', ['foo' => 'bar'])
+            ObjectCreatedEvent::for(new LightSwitch($subjectId)),
+            new StateChanged($subjectId, ['foo' => 'bar'])
         ];
 
         $iterator = StateProjector::intermediateIterator(MemoryEventStream::fromArray($events));
@@ -118,7 +120,7 @@ class StateProjectorTest extends TestCase
         $this->assertArrayHasKey('__meta', $actual[0]->toArray());
         $this->assertArrayHasKey('timestamp', $actual[0]->toArray()['__meta']);
         $this->assertSame('StateChanged', $actual[0]->toArray()['__meta']['type']);
-        $this->assertSame('some-id', $actual[0]->toArray()['__meta']['subject']['id']);
+        $this->assertSame('some-id', $actual[0]->toArray()['__meta']['subject']['id']->__toString());
         $this->assertSame(LightSwitch::class, $actual[0]->toArray()['__meta']['subject']['type']);
 
     }
@@ -130,9 +132,10 @@ class StateProjectorTest extends TestCase
      */
     public function intermediateIterator_twoEventsOneProperty_returnsStateAfterEachEvent()
     {
+        $subjectId = StringSubjectId::fromString('some-id');
         $events = [
-            new StateChanged('some-id', ['foo' => 'bar']),
-            new StateChanged('some-id', ['foo' => 'baz'])
+            new StateChanged($subjectId, ['foo' => 'bar']),
+            new StateChanged($subjectId, ['foo' => 'baz'])
         ];
 
         $iterator = StateProjector::intermediateIterator(MemoryEventStream::fromArray($events));

@@ -8,6 +8,7 @@ use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventSourcedObject;
 use mad654\eventstore\EventStream\AutoTrackingEventSourcedObjectTrait;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
+use mad654\eventstore\SubjectId;
 
 class LightSwitch implements EventSourcedObject
 {
@@ -19,7 +20,7 @@ class LightSwitch implements EventSourcedObject
     public $constructorInvocationCount = 0;
 
     /**
-     * @var string
+     * @var SubjectId
      */
     private $id;
 
@@ -28,14 +29,14 @@ class LightSwitch implements EventSourcedObject
      */
     private $state;
 
-    public function __construct(string $id)
+    public function __construct(SubjectId $id)
     {
         $this->events = new MemoryEventStream();
         $this->record(new StateChanged($id, ['state' => false]));
         $this->constructorInvocationCount++;
     }
 
-    public function subjectId(): string
+    public function subjectId(): SubjectId
     {
         return $this->id;
     }

@@ -36,7 +36,7 @@ class EventObjectStoreTest extends FileTestCase
             ->method('new')
             ->with('some-subject-id');
 
-        $subject = new LightSwitch('some-subject-id');
+        $subject = new LightSwitch(StringSubjectId::fromString('some-subject-id'));
 
         $this->instance()->attach($subject);
     }
@@ -51,7 +51,7 @@ class EventObjectStoreTest extends FileTestCase
             ->method('new')
             ->willReturn($stream);
 
-        $this->instance()->attach(new LightSwitch('some-subject-id'));
+        $this->instance()->attach(new LightSwitch(StringSubjectId::fromString('some-subject-id')));
         $streamData = iterator_to_array($stream->getIterator());
 
         $this->assertInstanceOf(ObjectCreatedEvent::class, $streamData[0]);
@@ -67,7 +67,7 @@ class EventObjectStoreTest extends FileTestCase
             ->method('new')
             ->willReturn($stream);
 
-        $this->instance()->attach(new LightSwitch('some-subject-id'));
+        $this->instance()->attach(new LightSwitch(StringSubjectId::fromString('some-subject-id')));
 
         $this->assertCount(2, iterator_to_array($stream->getIterator()));
     }
@@ -79,13 +79,14 @@ class EventObjectStoreTest extends FileTestCase
      */
     public function attach_changesAfterAttach_trackedAutomatically()
     {
+        $subjectId = StringSubjectId::fromString('initial-id');
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
-        $expected = new LightSwitch('initial-id');
+        $expected = new LightSwitch($subjectId);
         $store->attach($expected);
 
         $expected->switchOn();
 
-        $acutal = $store->get('initial-id');
+        $acutal = $store->get($subjectId);
         if (!$acutal instanceof LightSwitch) {
             $this->fail("Actual instance of TestSubject");
         }
@@ -99,12 +100,13 @@ class EventObjectStoreTest extends FileTestCase
      */
     public function get_subjectIdKnown_returnsEqualSubjectWithoutCallingConstructor()
     {
-        $expected = new LightSwitch('one');
+        $subjectId = StringSubjectId::fromString('one');
+        $expected = new LightSwitch($subjectId);
         $expected->constructorInvocationCount = 0;
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
         $store->attach($expected);
 
-        $actual = $store->get('one');
+        $actual = $store->get($subjectId);
 
         $expected->events = null;
         if ($actual instanceof LightSwitch) {
@@ -121,25 +123,27 @@ class EventObjectStoreTest extends FileTestCase
      */
     public function get_subjectIdUnknown_throwsException()
     {
-        $this->instance(new FileEventStreamFactory($this->rootDirPath()))->get('unknown');
+        $unknownId = StringSubjectId::fromString('unknown');
+        $this->instance(new FileEventStreamFactory($this->rootDirPath()))->get($unknownId);
     }
 
     /**
      * @test
-     * fixme: test depends on TestSubject::replay implementation
+     * fixme: test depends on LightSwitch::replay implementation
      */
     public function get_changesAfterLoad_trackedAutomatically()
     {
+        $subjectId = StringSubjectId::fromString('initial-id');
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
-        $store->attach(new LightSwitch('initial-id'));
-        $expected = $store->get('initial-id');
+        $store->attach(new LightSwitch($subjectId));
+        $expected = $store->get($subjectId);
         if (!$expected instanceof LightSwitch) {
             $this->fail("Expected instance of TestSubject");
         }
 
         $expected->switchOn();
 
-        $acutal = $store->get('initial-id');
+        $acutal = $store->get($subjectId);
         if (!$acutal instanceof LightSwitch) {
             $this->fail("Expected instance of TestSubject");
         }

@@ -20,7 +20,7 @@ class ObjectCreatedEvent extends StateChanged implements Event
      */
     private function __construct(string $id, string $className)
     {
-        parent::__construct($id, ['class_name' => $className]);
+        parent::__construct(StringSubjectId::fromString($id), ['class_name' => $className]);
         $this->className = $className;
 
     }

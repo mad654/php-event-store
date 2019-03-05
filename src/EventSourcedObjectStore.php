@@ -37,7 +37,7 @@ class EventSourcedObjectStore
         $emitter->emitEventsTo($stream);
     }
 
-    public function get(string $key): EventSourcedObject
+    public function get(SubjectId $key): EventSourcedObject
     {
         try {
             $stream = $this->streamFactory->get($key);

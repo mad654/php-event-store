@@ -5,6 +5,7 @@ namespace mad654\eventstore\FileEventStream;
 
 use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventStream\EventStreamFactory;
+use mad654\eventstore\StringSubjectId;
 use mad654\eventstore\TestCase\FileTestCase;
 
 class FileEventStreamFactoryTest extends FileTestCase
@@ -107,7 +108,7 @@ class FileEventStreamFactoryTest extends FileTestCase
     {
         $factory = $this->instance();
         $expected = $factory->new('some-id')
-            ->append(new StateChanged('some-id', ['name' => 'one']));
+            ->append(new StateChanged(StringSubjectId::fromString('some-id'), ['name' => 'one']));
 
         $actual = $factory->get('some-id');
 
@@ -129,9 +130,10 @@ class FileEventStreamFactoryTest extends FileTestCase
      */
     public function get_newFactoryInstance_returnsStreamInstanceWithEqualEvents()
     {
+        $subjectId = StringSubjectId::fromString('some-id');
         $expected = $this->instance()->new('some-id')
-            ->append(new StateChanged('some-id', ['name' => 'one']))
-            ->append(new StateChanged('some-id', ['name' => 'two']));
+            ->append(new StateChanged($subjectId, ['name' => 'one']))
+            ->append(new StateChanged($subjectId, ['name' => 'two']));
 
         $actual = $this->instance()->get('some-id');
 

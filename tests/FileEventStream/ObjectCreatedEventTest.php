@@ -13,7 +13,7 @@ class ObjectCreatedEventTest extends TestCase
      */
     public function createFor_always_createInstance()
     {
-        $actual = ObjectCreatedEvent::for(new LightSwitch('foo'));
+        $actual = ObjectCreatedEvent::for(new LightSwitch(StringSubjectId::fromString('foo')));
 
         $this->assertInstanceOf(ObjectCreatedEvent::class, $actual);
         $this->assertInstanceOf(Event::class, $actual);
@@ -24,7 +24,7 @@ class ObjectCreatedEventTest extends TestCase
      */
     public function payload_always_containsValidClassName()
     {
-        $event = ObjectCreatedEvent::for(new LightSwitch('foo'));
+        $event = ObjectCreatedEvent::for(new LightSwitch(StringSubjectId::fromString('foo')));
 
         $actual = $event->payload();
 

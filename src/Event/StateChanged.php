@@ -5,6 +5,7 @@ namespace mad654\eventstore\Event;
 
 use Dflydev\DotAccessData\Data;
 use mad654\eventstore\Event;
+use mad654\eventstore\SubjectId;
 
 class StateChanged implements Event
 {
@@ -19,12 +20,11 @@ class StateChanged implements Event
     private $payload;
 
     /**
-     * @var string
-     * @TODO refactor to ID Object
+     * @var SubjectId
      */
     private $subjectId;
 
-    public function __construct(string $subjectId, array $payload)
+    public function __construct(SubjectId $subjectId, array $payload)
     {
         try {
             $this->timestamp = new \DateTimeImmutable();
@@ -64,7 +64,7 @@ class StateChanged implements Event
         return $this->timestamp;
     }
 
-    public function subjectId(): string
+    public function subjectId(): SubjectId
     {
         return $this->subjectId;
     }

@@ -16,9 +16,10 @@ class FileEventStreamPerformanceTestIntegration extends FileTestCase
     public function iterateAllEvents_singleFile10000Events_loadsIn50ms()
     {
         $stream = $this->newInstance();
-
+        $subjectId = StringSubjectId::fromString('some-id');
+        
         foreach (range(1, 10000) as $iteration) {
-            $stream->append(new StateChanged('some-id', ['id' => $iteration]));
+            $stream->append(new StateChanged($subjectId, ['id' => $iteration]));
         }
 
         $actual = $this->loadInstance();

@@ -17,5 +17,5 @@ interface Event
 
     public function get(string $key, $default = null);
 
-    public function subjectId(): string;
+    public function subjectId(): SubjectId;
 }

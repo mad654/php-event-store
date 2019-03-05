@@ -4,6 +4,7 @@ namespace mad654\eventstore\Event;
 
 
 use mad654\eventstore\Event;
+use mad654\eventstore\StringSubjectId;
 use PHPUnit\Framework\TestCase;
 
 class StateChangedTest extends TestCase
@@ -13,7 +14,10 @@ class StateChangedTest extends TestCase
      */
     public function __construct_always_returnsInstanceOfEvent()
     {
-        $this->assertInstanceOf(Event::class, new StateChanged('some-id', []));
+        $this->assertInstanceOf(
+            Event::class,
+            new StateChanged(StringSubjectId::fromString('some-id'), [])
+        );
     }
 
     /**
@@ -22,7 +26,7 @@ class StateChangedTest extends TestCase
     public function __construct_always_hasImmutableTimestamp()
     {
         $start = new \DateTimeImmutable();
-        $event = new StateChanged('some-id', []);
+        $event = new StateChanged(StringSubjectId::fromString('some-id'), []);
 
         $actual = $event->timestamp();
 
@@ -35,7 +39,7 @@ class StateChangedTest extends TestCase
      */
     public function payload_always_returnsArray()
     {
-        $instance = new StateChanged('some-id', ['foo' => 'bar']);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar']);
         $this->assertSame(['foo' => 'bar'], $instance->payload());
     }
 
@@ -44,7 +48,7 @@ class StateChangedTest extends TestCase
      */
     public function has_always_returnsFalse()
     {
-        $instance = new StateChanged('some-id', []);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), []);
         $this->assertFalse($instance->has('foo'));
     }
 
@@ -53,7 +57,7 @@ class StateChangedTest extends TestCase
      */
     public function has_keyExists_returnsTrue()
     {
-        $instance = new StateChanged('some-id', ['foo' => 'bar']);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar']);
         $this->assertTrue($instance->has('foo'));
     }
 
@@ -62,7 +66,7 @@ class StateChangedTest extends TestCase
      */
     public function has_pathMatchNestedArray_returnsTrue()
     {
-        $instance = new StateChanged('some-id', ['foo' => ['bar' => 'foobar']]);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => ['bar' => 'foobar']]);
         $this->assertTrue($instance->has('foo.bar'));
     }
 
@@ -71,7 +75,7 @@ class StateChangedTest extends TestCase
      */
     public function get_always_returnsNull()
     {
-        $instance = new StateChanged('some-id', []);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), []);
         $this->assertNull($instance->get('foo'));
     }
 
@@ -80,7 +84,7 @@ class StateChangedTest extends TestCase
      */
     public function get_withDefaultKeyMissing_returnsDefault()
     {
-        $instance = new StateChanged('some-id', []);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), []);
         $this->assertSame('bar', $instance->get('foo', 'bar'));
     }
 
@@ -89,7 +93,7 @@ class StateChangedTest extends TestCase
      */
     public function get_keyExists_returnsValue()
     {
-        $instance = new StateChanged('some-id', ['foo' => 'bar']);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar']);
         $this->assertSame('bar', $instance->get('foo'));
     }
 
@@ -98,7 +102,7 @@ class StateChangedTest extends TestCase
      */
     public function get_pathMatchNestedArray_returnsValue()
     {
-        $instance = new StateChanged('some-id', ['foo' => ['bar' => 'foobar']]);
+        $instance = new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => ['bar' => 'foobar']]);
         $this->assertSame('foobar', $instance->get('foo.bar'));
     }
 }
