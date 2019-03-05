@@ -28,14 +28,14 @@ class StateProjector implements EventStreamConsumer
     private $stream;
 
     /**
-     * @var array
-     */
-    private $meta;
-
-    /**
      * @var \DateTimeImmutable
      */
     private $lastEventTimestamp;
+
+    /**
+     * @var string
+     */
+    private $lastEventType;
 
     /**
      * @var string
@@ -48,23 +48,12 @@ class StateProjector implements EventStreamConsumer
     private $subjectType;
 
     /**
-     * @var string
-     */
-    private $lastEventType;
-
-    /**
      * StateProjector constructor.
      */
     public function __construct()
     {
         $this->projection = [];
         $this->stream = new MemoryEventStream();
-        $this->meta = [
-            'subject' => [
-                'id' => 'UNKNOWN',
-                'class' => 'UNKNOWN'
-            ]
-        ];
     }
 
     /**
@@ -73,7 +62,7 @@ class StateProjector implements EventStreamConsumer
      * previously given to replay
      *
      * @param EventStream $stream
-     * @return \Iterator
+     * @return \Iterator|StateProjector[]
      */
     public static function intermediateIterator(EventStream $stream): \Iterator
     {
@@ -87,7 +76,7 @@ class StateProjector implements EventStreamConsumer
                 continue;
             }
 
-            yield $intermediate->toArray();
+            yield clone $intermediate;
         }
     }
 
@@ -128,19 +117,44 @@ class StateProjector implements EventStreamConsumer
 
     public function toArray(): array
     {
-        $result = $this->projection;
-        $result['__meta'] = $this->meta;
+        $result = $this->projection();
+        $result['__meta'] = [];
         $formated = '';
 
-        if (!is_null($this->lastEventTimestamp)) {
-            $formated = $this->lastEventTimestamp->format(DATE_ATOM);
+        if (!is_null($this->lastEventTimestamp())) {
+            $formated = $this->lastEventTimestamp()->format(DATE_ATOM);
         }
 
         $result['__meta']['timestamp'] = $formated;
-        $result['__meta']['type'] = $this->lastEventType;
-        $result['__meta']['subject']['id'] = $this->subjectId;
-        $result['__meta']['subject']['type'] = $this->subjectType;
+        $result['__meta']['type'] = $this->lastEventType();
+        $result['__meta']['subject']['id'] = $this->subjectId();
+        $result['__meta']['subject']['type'] = $this->subjectType();
 
         return $result;
+    }
+
+    public function lastEventTimestamp(): ?\DateTimeImmutable
+    {
+        return $this->lastEventTimestamp;
+    }
+
+    public function lastEventType(): ?string
+    {
+        return $this->lastEventType;
+    }
+
+    public function subjectId(): ?string
+    {
+        return $this->subjectId;
+    }
+
+    private function subjectType(): ?string
+    {
+        return $this->subjectType;
+    }
+
+    public function projection(): array
+    {
+        return $this->projection;
     }
 }

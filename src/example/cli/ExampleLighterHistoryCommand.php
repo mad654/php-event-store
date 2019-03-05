@@ -21,33 +21,11 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
      */
     private $history;
 
-    /**
-     * @var StateProjector
-     */
-    private $projector;
-
     /*
      * TODO: change example to 2 properties?
 
      * TODO: Limit print to last 3 Events
      *
-     * FIXME: implement like this + make this default without counter
-     * $this->projector->on($event);
-     * $this->history[] = $this->projector->getIterator($map = function(Event $event, $data) {
-     *      $entry = [
-     *          count($this->history);
-     *          $event->timestamp()->format(DATE_ATOM),
-     *          $data['__meta']['type'],
-     *          $data['__meta']['id'],
-     *      ];
-     *      unset($data['_meta'];
-     *      return array_merge($entry, $data);
-     * });
-    try {
-        $type = (new \ReflectionClass($event))->getShortName();
-    } catch (\ReflectionException $reflectionException) {
-        $type = 'UNKNOWN';
-    }
     */
 
     public function render(EventStream $events): void
@@ -56,23 +34,17 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
         // TODO: Add table separator between events
 
         $this->history = [['nr', 'timestamp', 'event_type', 'id', 'property', 'new_state']];
-        $this->projector = new StateProjector();
-        $this->projector->replay($events);
-        // FIXME: returns StateProjector as $data, $data->timestamp(),
-        // FIXME: returns StateProjector as $data, $data->type(),
-        // FIXME: returns StateProjector as $data, $data->subjectId(),
-        // FIXME: returns StateProjector as $data, $data->subjectType(),
-        // FIXME: returns StateProjector as $data, $data->state(),
-        foreach (StateProjector::intermediateIterator($events) as $data) {
+
+        /* @var \mad654\eventstore\StateProjector $state */
+        foreach (StateProjector::intermediateIterator($events) as $state) {
             $entry = [
                 count($this->history),
-                $data['__meta']['timestamp'],
-                $data['__meta']['type'],
-                $data['__meta']['subject']['id'],
+                $state->lastEventTimestamp()->format(DATE_ATOM),
+                $state->lastEventType(),
+                $state->subjectId(),
             ];
 
-            unset($data['__meta']);
-            foreach ($data as $key => $value) {
+            foreach ($state->projection() as $key => $value) {
                 $entry[] = $key;
                 $entry[] = $value;
             }

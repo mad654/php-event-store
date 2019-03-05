@@ -111,14 +111,15 @@ class StateProjectorTest extends TestCase
 
         $iterator = StateProjector::intermediateIterator(MemoryEventStream::fromArray($events));
 
+        // FIXME: cleanup toArray
         $actual = iterator_to_array($iterator);
         $this->assertCount(1, $actual);
-        $this->assertSame('bar', $actual[0]['foo']);
-        $this->assertArrayHasKey('__meta', $actual[0]);
-        $this->assertArrayHasKey('timestamp', $actual[0]['__meta']);
-        $this->assertSame('StateChanged', $actual[0]['__meta']['type']);
-        $this->assertSame('some-id', $actual[0]['__meta']['subject']['id']);
-        $this->assertSame(LightSwitch::class, $actual[0]['__meta']['subject']['type']);
+        $this->assertSame('bar', $actual[0]->toArray()['foo']);
+        $this->assertArrayHasKey('__meta', $actual[0]->toArray());
+        $this->assertArrayHasKey('timestamp', $actual[0]->toArray()['__meta']);
+        $this->assertSame('StateChanged', $actual[0]->toArray()['__meta']['type']);
+        $this->assertSame('some-id', $actual[0]->toArray()['__meta']['subject']['id']);
+        $this->assertSame(LightSwitch::class, $actual[0]->toArray()['__meta']['subject']['type']);
 
     }
 
@@ -137,7 +138,8 @@ class StateProjectorTest extends TestCase
         $iterator = StateProjector::intermediateIterator(MemoryEventStream::fromArray($events));
         $actual = iterator_to_array($iterator);
 
-        $this->assertSame('bar', $actual[0]['foo']);
-        $this->assertSame('baz', $actual[1]['foo']);
+        // FIXME: cleanup toArray
+        $this->assertSame('bar', $actual[0]->toArray()['foo']);
+        $this->assertSame('baz', $actual[1]->toArray()['foo']);
     }
 }
