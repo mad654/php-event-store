@@ -34,7 +34,10 @@ class StateProjectorTest extends TestCase
      */
     public function toArray_always_returnsArray()
     {
-        $this->assertSame([], $this->instance()->toArray());
+        $actual = $this->instance()->toArray();
+        unset($actual['__meta']);
+
+        $this->assertSame([], $actual);
     }
 
     /**
@@ -46,7 +49,10 @@ class StateProjectorTest extends TestCase
             new StateChanged('some-id', ['foo' => 'bar'])
         ];
 
-        $this->assertSame(['foo' => 'bar'], $this->instance($events)->toArray());
+        $actual = $this->instance($events)->toArray();
+        unset($actual['__meta']);
+
+        $this->assertSame(['foo' => 'bar'], $actual);
     }
 
     /**
@@ -58,7 +64,10 @@ class StateProjectorTest extends TestCase
             new StateChanged('some-id', ['foo' => 'bar', 'bar' => 'foobar'])
         ];
 
-        $this->assertSame(['foo' => 'bar', 'bar' => 'foobar'], $this->instance($events)->toArray());
+        $actual = $this->instance($events)->toArray();
+        unset($actual['__meta']);
+
+        $this->assertSame(['foo' => 'bar', 'bar' => 'foobar'], $actual);
     }
 
     /**
@@ -71,7 +80,10 @@ class StateProjectorTest extends TestCase
             new StateChanged('some-id', ['foo' => 'baz'])
         ];
 
-        $this->assertSame(['foo' => 'baz'], $this->instance($events)->toArray());
+        $actual = $this->instance($events)->toArray();
+        unset($actual['__meta']);
+
+        $this->assertSame(['foo' => 'baz'], $actual);
     }
 
     /**

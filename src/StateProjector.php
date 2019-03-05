@@ -28,12 +28,43 @@ class StateProjector implements EventStreamConsumer
     private $stream;
 
     /**
+     * @var array
+     */
+    private $meta;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    private $lastEventTimestamp;
+
+    /**
+     * @var string
+     */
+    private $subjectId;
+
+    /**
+     * @var string
+     */
+    private $subjectType;
+
+    /**
+     * @var string
+     */
+    private $lastEventType;
+
+    /**
      * StateProjector constructor.
      */
     public function __construct()
     {
         $this->projection = [];
         $this->stream = new MemoryEventStream();
+        $this->meta = [
+            'subject' => [
+                'id' => 'UNKNOWN',
+                'class' => 'UNKNOWN'
+            ]
+        ];
     }
 
     /**
@@ -47,39 +78,17 @@ class StateProjector implements EventStreamConsumer
     public static function intermediateIterator(EventStream $stream): \Iterator
     {
         $intermediate = new self();
-        $meta = [
-            'subject' => [
-                'id' => 'UNKNOWN',
-                'class' => 'UNKNOWN'
-            ]
-        ];
 
         /* @var Event $event */
         foreach ($stream as $event) {
+            $intermediate->on($event);
+
             if ($event instanceof ObjectCreatedEvent) {
-                $meta['subject']['type'] = $event->get('class_name');
                 continue;
             }
 
-            $intermediate->on($event);
-            $state = $intermediate->toArray();
-            $state['__meta'] = $meta;
-            $state['__meta']['timestamp'] = $event->timestamp()->format(DATE_ATOM);
-            $state['__meta']['subject']['id'] = $event->subjectId();
-
-            try {
-                $state['__meta']['type'] = (new \ReflectionClass($event))->getShortName();
-            } catch (\ReflectionException $reflectionException) {
-                $state['__meta']['type'] = 'UNKNOWN';
-            }
-
-            yield $state;
+            yield $intermediate->toArray();
         }
-    }
-
-    public function toArray(): array
-    {
-        return $this->projection;
     }
 
     public function replay(EventStream $stream): void
@@ -98,8 +107,40 @@ class StateProjector implements EventStreamConsumer
 
     public function on(Event $event): void
     {
+        if ($event instanceof ObjectCreatedEvent) {
+            $this->subjectType = $event->get('class_name');
+            return;
+        }
+
+        $this->lastEventTimestamp = $event->timestamp();
+        $this->subjectId = $event->subjectId();
+
+        try {
+            $this->lastEventType = (new \ReflectionClass($event))->getShortName();
+        } catch (\ReflectionException $reflectionException) {
+            $this->lastEventType = 'UNKNOWN';
+        }
+
         foreach ($event->payload() as $key => $value) {
             $this->projection[$key] = $value;
         }
+    }
+
+    public function toArray(): array
+    {
+        $result = $this->projection;
+        $result['__meta'] = $this->meta;
+        $formated = '';
+
+        if (!is_null($this->lastEventTimestamp)) {
+            $formated = $this->lastEventTimestamp->format(DATE_ATOM);
+        }
+
+        $result['__meta']['timestamp'] = $formated;
+        $result['__meta']['type'] = $this->lastEventType;
+        $result['__meta']['subject']['id'] = $this->subjectId;
+        $result['__meta']['subject']['type'] = $this->subjectType;
+
+        return $result;
     }
 }
