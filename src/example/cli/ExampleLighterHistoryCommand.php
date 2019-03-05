@@ -58,11 +58,11 @@ class ExampleLighterHistoryCommand extends Command implements EventStreamRendere
         $this->history = [['nr', 'timestamp', 'event_type', 'id', 'property', 'new_state']];
         $this->projector = new StateProjector();
         $this->projector->replay($events);
-        // FIXME: $data->meta->timestamp,
-        // FIXME: $data->meta->type,
-        // FIXME: $data->meta->subject->id,
-        // FIXME: $data->meta->subject->type,
-        // FIXME: $data->state,
+        // FIXME: returns StateProjector as $data, $data->timestamp(),
+        // FIXME: returns StateProjector as $data, $data->type(),
+        // FIXME: returns StateProjector as $data, $data->subjectId(),
+        // FIXME: returns StateProjector as $data, $data->subjectType(),
+        // FIXME: returns StateProjector as $data, $data->state(),
         foreach (StateProjector::intermediateIterator($events) as $data) {
             $entry = [
                 count($this->history),
