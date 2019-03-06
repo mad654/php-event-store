@@ -16,7 +16,6 @@ trait AutoTrackingEventSourcedObjectTrait
     public function replay(EventStream $stream): void
     {
         $this->id = null;
-        # fixme: this makes subject unserializable, maybe we can feed in a proxy stream, which uses static calls to retrieve the real stream
         $this->events = $stream;
 
         foreach ($stream->getIterator() as $event) {
@@ -27,7 +26,6 @@ trait AutoTrackingEventSourcedObjectTrait
     public function emitEventsTo(EventStream $stream): void
     {
         $stream->appendAll($this->events);
-        # fixme: this makes subject unserializable, maybe we can feed in a proxy stream, which uses static calls to retrieve the real stream
         $this->events = $stream;
     }
 
