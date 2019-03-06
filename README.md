@@ -10,15 +10,36 @@ which installs all needed dependencies.
 
 ## getting started
 
+```bash
+cd local_develop
+vagrant up
+vagrant ssh
 ```
+
+Inside of the vagrant box:
+
+```bash
 composer install
 make test
 ```
 
-## development
+### example
 
-```
-make test.watch
+For a full working example take a look at `src/example`. In your vagrant box you can use it like this:
+
+```bash
+# create storage folder
+mkdir -p /tmp/var/eventstore-example/ 
+
+# create a new instance of LightSwitch with id 'kitchen'
+src/example/bin/console.php init kitchen
+
+# switch on/off on 'kitchen'
+src/example/bin/console.php switch kitchen --on
+src/example/bin/console.php switch kitchen --off
+
+# render history of 'kitchen'
+src/example/bin/console.php history kitchen
 ```
 
 ## motivation
@@ -241,3 +262,11 @@ des Subjects ab.
 ### EventConsumer / Projector
 
 @TBD
+
+## development
+
+```
+make test.watch
+```
+
+## 
