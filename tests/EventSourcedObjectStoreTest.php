@@ -149,6 +149,54 @@ class EventSourcedObjectStoreTest extends FileTestCase
         $this->assertTrue($acutal->isOn());
     }
 
+    /**
+     * @test
+     */
+    public function get_filestreamAttachedObject_isSerializeable()
+    {
+        $subjectId = StringSubjectId::fromString('initial-id');
+        $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
+        $store->attach(new LightSwitch($subjectId));
+        $fetched = $store->get($subjectId);
+
+        $serialized = serialize($fetched);
+
+        $this->assertTrue(is_string($serialized));
+    }
+
+    /**
+     * @test
+     */
+    public function get_filestreamAttachedObject_isUnserializeable()
+    {
+        $subjectId = StringSubjectId::fromString('initial-id');
+        $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
+        $store->attach(new LightSwitch($subjectId));
+        $fetched = $store->get($subjectId);
+
+        $serialized = serialize($fetched);
+        $unserialized = unserialize($serialized);
+        if (!$unserialized instanceof LightSwitch) {
+            $this->fail("Expected instance of TestSubject");
+        }
+
+        $unserialized->switchOn();
+        $fetchedUnserialized = $store->get($subjectId);
+        if (!$fetchedUnserialized instanceof LightSwitch) {
+            $this->fail("Expected instance of TestSubject");
+        }
+
+        $expectedEvents = new MemoryEventStream();
+        $unserialized->emitEventsTo($expectedEvents);
+
+        $actualEvents = new MemoryEventStream();
+        $unserialized->emitEventsTo($actualEvents);
+
+        $this->assertEquals($expectedEvents, $actualEvents);
+    }
+
+    // todo attached object is serializeable
+
     public function instance(FileEventStreamFactory $factory = null): EventSourcedObjectStore
     {
         if (is_null($factory)) {

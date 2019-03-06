@@ -60,10 +60,14 @@ final class FileEventStream implements EventStream, Logable
         $this->filePath = self::constructFilePath($rootDirPath, $name);
         $this->rootDirPath = $rootDirPath;
         $this->name = $name;
-        $this->logger = new NullLogger();
+        $this->initLogger();
 
         $this->flock(LOCK_SH);
-        $this->logger->debug("opened `$this->filePath`");
+    }
+
+    private function initLogger(): void
+    {
+        $this->logger = new NullLogger();
     }
 
     public static function new(string $rooDirPath, string $id): self
@@ -205,10 +209,18 @@ final class FileEventStream implements EventStream, Logable
         return $this->fileHandle;
     }
 
+    public function __wakeup()
+    {
+        $this->initLogger();
+    }
+
     public function __sleep()
     {
         $this->unlockAndClose();
-        return array_keys(get_object_vars($this));
+        $propertiesToSerialize = array_keys(get_object_vars($this));
+        unset($propertiesToSerialize['fileHandle']);
+        unset($propertiesToSerialize['logger']);
+        return $propertiesToSerialize;
     }
 
     public function __destruct()
@@ -222,6 +234,4 @@ final class FileEventStream implements EventStream, Logable
         fclose($this->fileHandle());
         $this->logger->debug("closed `$this->filePath`");
     }
-
-
 }
