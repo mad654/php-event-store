@@ -10,9 +10,8 @@ trait AutoTrackingEventSourcedObjectTrait
 
     /**
      * @var EventStream
-     * FIXME: make me private
      */
-    public $events;
+    private $events;
 
     public function replay(EventStream $stream): void
     {

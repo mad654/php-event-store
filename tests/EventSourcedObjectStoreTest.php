@@ -7,6 +7,7 @@ use mad654\eventstore\EventStream\EventStreamFactory;
 use mad654\eventstore\example\LightSwitch;
 use mad654\eventstore\FileEventStream\FileEventStream;
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
+use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 use mad654\eventstore\TestCase\FileTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -91,7 +92,9 @@ class EventSourcedObjectStoreTest extends FileTestCase
             $this->fail("Actual instance of TestSubject");
         }
 
-        $this->assertCount(3, $acutal->events);
+        $actualEvents = new MemoryEventStream();
+        $acutal->emitEventsTo($actualEvents);
+        $this->assertCount(3, iterator_to_array($actualEvents));
         $this->assertTrue($acutal->isOn());
     }
 
@@ -107,11 +110,6 @@ class EventSourcedObjectStoreTest extends FileTestCase
         $store->attach($expected);
 
         $actual = $store->get($subjectId);
-
-        $expected->events = null;
-        if ($actual instanceof LightSwitch) {
-            $actual->events = null;
-        }
 
         $this->assertEquals($expected, $actual);
     }
@@ -148,7 +146,9 @@ class EventSourcedObjectStoreTest extends FileTestCase
             $this->fail("Expected instance of TestSubject");
         }
 
-        $this->assertCount(3, $acutal->events);
+        $actualEvents = new MemoryEventStream();
+        $acutal->emitEventsTo($actualEvents);
+        $this->assertCount(3, iterator_to_array($actualEvents));
         $this->assertTrue($acutal->isOn());
     }
 
