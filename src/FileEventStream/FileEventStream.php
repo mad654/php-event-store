@@ -58,13 +58,6 @@ final class FileEventStream implements EventStream, Logable
     private function __construct(string $rootDirPath, string $name)
     {
         $this->filePath = self::constructFilePath($rootDirPath, $name);
-        $fh = fopen($this->filePath, 'a+');
-
-        if ($fh === false) {
-            throw new \RuntimeException("Could not open storage file: `$this->filePath`");
-        }
-
-        $this->fileHandle = $fh;
         $this->rootDirPath = $rootDirPath;
         $this->name = $name;
         $this->logger = new NullLogger();
@@ -114,8 +107,8 @@ final class FileEventStream implements EventStream, Logable
             return;
         }
 
-        fseek($this->fileHandle, 0);
-        $content = fread($this->fileHandle, $filesize);
+        fseek($this->fileHandle(), 0);
+        $content = fread($this->fileHandle(), $filesize);
 
         foreach (explode(self::DELIMITER, $content) as $serialized) {
             if (empty($serialized)) {
@@ -136,10 +129,10 @@ final class FileEventStream implements EventStream, Logable
         $newLine = "$serialized" . self::DELIMITER;
 
         try {
-            if (fwrite($this->fileHandle, $newLine) === false) {
+            if (fwrite($this->fileHandle(), $newLine) === false) {
                 throw new \RuntimeException("write failed");
             }
-            if (fflush($this->fileHandle) === false) {
+            if (fflush($this->fileHandle()) === false) {
                 throw new \RuntimeException("flush failed");
             }
             clearstatcache(true, $this->filePath);
@@ -159,13 +152,6 @@ final class FileEventStream implements EventStream, Logable
         return $this;
     }
 
-    public function __destruct()
-    {
-        $this->flock(LOCK_UN);
-        fclose($this->fileHandle);
-        $this->logger->debug("closed `$this->filePath`");
-    }
-
     public function attachLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
@@ -173,7 +159,7 @@ final class FileEventStream implements EventStream, Logable
 
     private function flock(int $lockMethod): void
     {
-        if (flock($this->fileHandle, $lockMethod) === false) {
+        if (flock($this->fileHandle(), $lockMethod) === false) {
             throw new \RuntimeException("Could change lock to method: $lockMethod");
         }
     }
@@ -203,4 +189,39 @@ final class FileEventStream implements EventStream, Logable
             $this->append($event);
         }
     }
+
+    private function fileHandle()
+    {
+        if (!is_resource($this->fileHandle)) {
+            $fh = fopen($this->filePath, 'a+');
+
+            if ($fh === false) {
+                throw new \RuntimeException("Could not open storage file: `$this->filePath`");
+            }
+
+            $this->fileHandle = $fh;
+        }
+
+        return $this->fileHandle;
+    }
+
+    public function __sleep()
+    {
+        $this->unlockAndClose();
+        return array_keys(get_object_vars($this));
+    }
+
+    public function __destruct()
+    {
+        $this->unlockAndClose();
+    }
+
+    private function unlockAndClose(): void
+    {
+        $this->flock(LOCK_UN);
+        fclose($this->fileHandle());
+        $this->logger->debug("closed `$this->filePath`");
+    }
+
+
 }

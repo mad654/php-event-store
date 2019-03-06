@@ -144,4 +144,24 @@ class FileEventStreamTest extends FileTestCase
         $this->assertCount(2, $actualData);
         $this->assertEquals($expectedData, $actualData);
     }
+
+    /**
+     * @test
+     */
+    public function sut_afterUnserialize_canAppendEventsToFile()
+    {
+        $subjectId = StringSubjectId::fromString('some-id');
+        $expected = $this->instance();
+        $expected->append(new StateChanged($subjectId, ['name' => 'one']));
+
+        $serialized = serialize($expected);
+        $unserialized = unserialize($serialized);
+        $unserialized->append(new StateChanged($subjectId, ['name' => 'two']));
+        unset($unserialized);
+
+        $actual = $this->loadInstance();
+        $actualData = iterator_to_array($actual->getIterator());
+
+        $this->assertCount(2, $actualData);
+    }
 }
