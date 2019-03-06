@@ -9,8 +9,6 @@ use mad654\eventstore\EventStream\EventStreamEmitter;
 /**
  * Class ObjectCreatedEvent
  * @package mad654\eventstore
- *
- * FIXME Test if we loose timestamp after deserialisiatio
  */
 class ObjectCreatedEvent extends StateChanged implements Event
 {

@@ -30,4 +30,20 @@ class ObjectCreatedEventTest extends TestCase
 
         $this->assertEquals(['class_name' => LightSwitch::class], $actual);
     }
+
+    /**
+     * @test
+     */
+    public function serializeDeserialize_subclassOfStateChanged_keepsTimestamp()
+    {
+        $switch = new LightSwitch(new StringSubjectId('foo'));
+        $event = ObjectCreatedEvent::for($switch);
+
+        /* @var \mad654\eventstore\ObjectCreatedEvent $actual */
+        $serialized = serialize($event);
+        $actual = unserialize($serialized);
+
+        $this->assertNotNull($actual->timestamp());
+        $this->assertEquals($event->timestamp(), $actual->timestamp());
+    }
 }
