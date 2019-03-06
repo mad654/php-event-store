@@ -23,11 +23,13 @@ make test.watch
 
 ## motivation
 
-object relational mapping is hard, even its welcovered topic, you can only achive about 80% cases working: which?
+object relational mapping is hard, even if its well covered topic, you can only achive about 80% cases working: which?
 
 ORM needs a lot of work around ( db schema, migrations, db administration for different stages, db data migration between stages ( live -> staging -> local_develop )
 
 persistence easy like working with objects
+
+### How to solve
 
 track all state changes instead of last state, which give this opportunities (based on event sourcing):
 
@@ -45,73 +47,64 @@ Lets take this little example to get in touch with all the new stuff. Lets asume
 
 ```php
 class LightSwitch {	
-    private $kitchen = 'off';
+    private $state = false;
     
-    public function isKitchenOn(): bool {
-        return $this->kitchen;
+    public function isOn(): bool {
+        return $this->state;
     }
     
-    public function switchKitchenOn()
+    public function switchOn()
     {
-        if ($this->kitchen === 'on') return;
+        if ($this->state === true) return;
         // do some stuff which does the hard work
-        $this->kitchen = 'on';
+        $this->state = true;
     }
     
-    public function switchKitchenOff()
+    public function switchOff()
     {
-        if ($this->kitchen === 'off') return;
+        if ($this->state === false) return;
          // do some stuff which does the hard work
-        $this->kitchen = 'off';
+        $this->state = false;
     }
 }
 ```
 
 This is a good beginning, but now you need a way to persist the state.
 
-### EventStreamEmitter
+### EventSourceObject
 
-Instead of creating a database you can extend your class to implement the EventStreamEmitter interface. An EventStreamEmitter is simply an object which should be available in his current state in the next request and for this it can publish its events as a stream and can be build from scratch based on the events:
+Instead of creating a database you can extend your class to implement the EventSourcedObject interface. An EventSourcedObject is simply an object which should be available in his current state in the next request and for this it can publish its events as a stream and can be build from scratch based on the events:
 
 ```php
 <?php
-
-namespace mad654\eventstore\example;
-
-
 use mad654\eventstore\Event;
-use mad654\eventstore\event\StateChanged;
-use mad654\eventstore\EventStream\AutoTrackingEventStreamEmitter;
-use mad654\eventstore\EventStream\EventStreamEmitter;
+use mad654\eventstore\Event\StateChanged;
+use mad654\eventstore\EventSourcedObject;
+use mad654\eventstore\EventStream\AutoTrackingEventSourcedObjectTrait;
 use mad654\eventstore\MemoryEventStream\MemoryEventStream;
+use mad654\eventstore\SubjectId;
 
-class LightSwitch implements EventStreamEmitter
+class LightSwitch implements EventSourcedObject
 {
-    use AutoTrackingEventStreamEmitterTrait;
+    use AutoTrackingEventSourcedObjectTrait;
 
     /**
-     * @var int
-     */
-    public $constructorInvocationCount = 0;
-
-    /**
-     * @var string
+     * @var SubjectId
      */
     private $id;
 
     /**
-     * @var string
+     * @var bool
      */
     private $state;
 
-    public function __construct(string $id)
+    public function __construct(SubjectId $id)
     {
         $this->events = new MemoryEventStream();
-        $this->record(new StateChanged(['id' => $id, 'state' => false]));
-        $this->constructorInvocationCount++;
+        $this->record(new StateChanged($id, ['state' => false]));
     }
 
-    public function subjectId(): string
+    public function subjectId(): SubjectId
     {
         return $this->id;
     }
@@ -124,48 +117,49 @@ class LightSwitch implements EventStreamEmitter
     public function switchOn()
     {
         if ($this->state) return;
-        $this->record(new StateChanged(['state' => true]));
+        $this->record(new StateChanged($this->id, ['state' => true]));
     }
 
     public function switchOff()
     {
         if (!$this->state) return;
-        $this->record(new StateChanged(['state' => false]));
+        $this->record(new StateChanged($this->id, ['state' => false]));
     }
 
-    private function on(Event $event)
+    public function on(Event $event): void
     {
-        $this->id = $event->get('id', $this->id);
+        $this->id = $event->subjectId();
         $this->state = $event->get('state', $this->state);
     }
 
 }
 ```
 
-So instead of changing your member variables directly, you will use events for this, like shown in `switchKitchenOn`
+So instead of changing your member variables directly, you will use events for this, like shown in `switchOn`
 
 
-### EventObjectStore
+### EventSourcedObjectStore
 
 ```php
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
 use mad654\eventstore\EventObjectStore;
 
 $factory = new FileEventStreamFactory("/tmp/eventstore-example");
-$store = new EventObjectStore($factory);
+$store = new EventSourcedObjectStore($factory);
 ```
 
-The EventObjectStore provides a simple API which allows you to save and load objects which implements the EventEmitter interface:
+The EventSourcedObjectStore provides a simple API which allows you to save and load objects which implements the EventEmitter interface:
 
 ```php
-$store->attach($someEventEmitter);
-unset($someEventEmitter);
-$someEventEmitter = $store->get('id-of-some-event-emitter');
+$store->attach($someEventSourcedObject);
+unset($someEventSourcedObject);
+$id = StringSubjectId::fromString('id-of-some-object');
+$someEventEmitter = $store->get($id);
 ```
 
-If '$someEventEmitter' was implemented correctly, it should have the equal state - before and after the `unset()` call.
+If '$someEventSourcedObject' was implemented correctly, it should have the equal state - before and after the `unset()` call.
 
-By definition an EventObjectStore can only store and retrieve objects by id. Here you can find solutions for searching ...
+By definition an EventSourcedObjectStore can only store and retrieve objects by id. Here you can find solutions for searching ...
 
 ### Event
 
@@ -181,7 +175,7 @@ use mad654\eventstore\FileEventStream\FileEventStreamFactory;
 use mad654\eventstore\EventObjectStore;
 
 $factory = new FileEventStreamFactory("/tmp/eventstore-example");
-$store = new EventObjectStore($factory);
+$store = new EventSourcedObjectStore($factory);
 
 $switch = new LightSwitch('kitchen');
 $store->attach($switch);
@@ -192,13 +186,13 @@ $store->attach($switch);
 Some times later in an other request you want to switch on the light in the kitchen:
 
 ``` php
-$store->get('kitchen')->switchOn();
+$store->get(StringSubjectId::fromString('kitchen'))->switchOn();
 ```
 
 And again later you will switch it off again:
 
 ```php
-$store->get('kitchen')->switchOff();
+$store->get(StringSubjectId::fromString('kitchen'))->switchOff();
 ```
 
 
@@ -207,17 +201,25 @@ And again ...
 
 And again ...
 
-And now you are wondering why you power bill is so expensive - let's take a look at the history:
+And now you are wondering why your power bill is so expensive - let's take a look at the history:
 
 ```php
-$renderer = new SymfonyOutputEventStreamRenderer();
-echo $store->get('kitchen')->history($renderer);
+$renderer = new ArrayEventStreamRenderer();
+$store->get(StringSubjectId::fromString('kitchen'))->history($renderer);
+$data = $renderer->toArray();
 
-# timestamp           | event_type   | property | new_state
-# 2018-12-01 18:10:00 | GenericEvent | Lighter  | on
-# 2018-12-01 18:12:00 | GenericEvent | Lighter  | off
-# 2018-12-01 19:30:00 | GenericEvent | Lighter  | on
-# 2018-12-03 18:10:00 | GenericEvent | Lighter  | off
+// use symonfy command style to render a nice table on command line
+$io = new SymfonyStyle($input, $output);
+$io->table(
+    ['nr', 'timestamp', 'event_type', 'id', 'property', 'new_state'],
+    $data
+);
+
+# nr | timestamp           | event_type   | id       | property | new_state
+# 1  | 2018-12-01 18:10:00 | StateChanged | kittchen | state    | on
+# 2  | 2018-12-01 18:12:00 | StateChanged | kittchen | state    | off
+# 3  | 2018-12-01 19:30:00 | StateChanged | kittchen | state    | on
+# 4  | 2018-12-03 18:10:00 | StateChanged | kittchen | state    | off
 ```
 
 ## concepts
@@ -235,3 +237,7 @@ Ob alle neuen Events persistiert werden, hängt von der Implementierung
 des Subjects ab.
 
 @TBD API die state changes über events super einfach macht
+
+### EventConsumer / Projector
+
+@TBD

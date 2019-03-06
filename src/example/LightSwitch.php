@@ -16,6 +16,7 @@ class LightSwitch implements EventSourcedObject
 
     /**
      * @var int
+     * @FIXME remove from here
      */
     public $constructorInvocationCount = 0;
 
@@ -25,7 +26,7 @@ class LightSwitch implements EventSourcedObject
     private $id;
 
     /**
-     * @var string
+     * @var bool
      */
     private $state;
 
