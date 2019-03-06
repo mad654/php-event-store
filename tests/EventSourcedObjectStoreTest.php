@@ -75,8 +75,6 @@ class EventSourcedObjectStoreTest extends FileTestCase
 
     /**
      * @test
-     *
-     * fixme: test depends on TestSubject::attach implementation
      */
     public function attach_changesAfterAttach_trackedAutomatically()
     {
@@ -127,7 +125,6 @@ class EventSourcedObjectStoreTest extends FileTestCase
 
     /**
      * @test
-     * fixme: test depends on LightSwitch::replay implementation
      */
     public function get_changesAfterLoad_trackedAutomatically()
     {

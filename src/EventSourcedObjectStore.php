@@ -41,7 +41,7 @@ class EventSourcedObjectStore
     {
         try {
             $stream = $this->streamFactory->get($key);
-            return $this->toEventStreamEmitter($stream);
+            return $this->toEventSourcedObject($stream);
         } catch (\RuntimeException $e) {
             throw new \RuntimeException(
                 "Object with id `$key` not found",
@@ -51,7 +51,7 @@ class EventSourcedObjectStore
         }
     }
 
-    private function toEventStreamEmitter(EventStream $stream): EventSourcedObject
+    private function toEventSourcedObject(EventStream $stream): EventSourcedObject
     {
         $class = $this->extractSubjectClassName($stream);
 
