@@ -12,10 +12,11 @@ class EventObjectStorePerformanceTestIntegration extends FileTestCase
     /**
      * @test
      */
-    public function get_singleSubjectWith10000Events_loadsIn65ms()
+    public function get_singleSubjectWith10000Events_loadsIn100ms()
     {
+        $id = StringSubjectId::fromString('foo');
         $store = new EventSourcedObjectStore(new FileEventStreamFactory($this->rootDirPath()));
-        $subject = new LightSwitch(StringSubjectId::fromString('foo'));
+        $subject = new LightSwitch($id);
         $store->attach($subject);
 
         foreach (range(1, 10000) as $i) {
@@ -23,11 +24,11 @@ class EventObjectStorePerformanceTestIntegration extends FileTestCase
         }
 
 
-        $diff = take_time(function () {
+        $diff = take_time(function () use ($id) {
             $store = new EventSourcedObjectStore(new FileEventStreamFactory($this->rootDirPath()));
-            $store->get('foo');
+            $store->get($id);
         });
 
-        $this->assertlessThanOrEqual(65, $diff, $diff);
+        $this->assertlessThanOrEqual(100, $diff, $diff);
     }
 }
