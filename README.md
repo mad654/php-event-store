@@ -3,7 +3,6 @@
 ## os dependencies
 
 - composer in path
-- watchexec in path
 
 In local_develop is a prepared Vagrantfile
 which installs all needed dependencies.
@@ -102,17 +101,11 @@ use mad654\eventstore\Event;
 use mad654\eventstore\Event\StateChanged;
 use mad654\eventstore\EventSourcedObject;
 use mad654\eventstore\EventStream\AutoTrackingEventSourcedObjectTrait;
-use mad654\eventstore\MemoryEventStream\MemoryEventStream;
 use mad654\eventstore\SubjectId;
 
 class LightSwitch implements EventSourcedObject
 {
     use AutoTrackingEventSourcedObjectTrait;
-
-    /**
-     * @var SubjectId
-     */
-    private $id;
 
     /**
      * @var bool
@@ -121,13 +114,7 @@ class LightSwitch implements EventSourcedObject
 
     public function __construct(SubjectId $id)
     {
-        $this->events = new MemoryEventStream();
-        $this->record(new StateChanged($id, ['state' => false]));
-    }
-
-    public function subjectId(): SubjectId
-    {
-        return $this->id;
+        $this->init($id, ['state' => false]);
     }
 
     public function isOn(): bool
@@ -138,25 +125,26 @@ class LightSwitch implements EventSourcedObject
     public function switchOn()
     {
         if ($this->state) return;
-        $this->record(new StateChanged($this->id, ['state' => true]));
+        $this->record(new StateChanged($this->subjectId(), ['state' => true]));
     }
 
     public function switchOff()
     {
         if (!$this->state) return;
-        $this->record(new StateChanged($this->id, ['state' => false]));
+        $this->record(new StateChanged($this->subjectId(), ['state' => false]));
     }
 
     public function on(Event $event): void
     {
-        $this->id = $event->subjectId();
         $this->state = $event->get('state', $this->state);
     }
 
 }
 ```
 
-So instead of changing your member variables directly, you will use events for this, like shown in `switchOn`
+So instead of changing your member variables directly, you will use events for this, like shown in `switchOn`. So you will `record` an event and you will update your state in the `on` function, which is automatically be called by `record` function.
+
+If you want to see more details, take a look at the `AutoTrackingEventSourcedObjectTrait` which should be a good starting point for all your event sourced objects and reduce boilerplate code. 
 
 
 ### EventSourcedObjectStore
@@ -266,7 +254,7 @@ des Subjects ab.
 ## development
 
 ```
-make test.watch
+watch make test.unit
 ```
 
 ## 
