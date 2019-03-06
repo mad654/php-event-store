@@ -32,25 +32,47 @@ class StateProjectorTest extends TestCase
     /**
      * @test
      */
-    public function toArray_always_returnsArray()
+    public function get_always_returnsNull()
     {
-        $actual = $this->instance()->toArray();
-        unset($actual['__meta']);
+        $projector = $this->instance([]);
 
-        $this->assertSame([], $actual);
+        $this->assertNull($projector->get('foo'));
     }
 
     /**
      * @test
      */
-    public function toArray_eventWithOneProperty_returnsArrayWithOneProperty()
+    public function get_keyNotExistsWithDefault_returnsDefault()
+    {
+        $projector = $this->instance([]);
+
+        $this->assertEquals('bar', $projector->get('foo', 'bar'));
+    }
+
+    /**
+     * @test
+     */
+    public function get_keysExist_returnsValue()
+    {
+        $subjectId = new StringSubjectId('test');
+        $payload = ['foo' => 'bar', 'foz' => 'baz'];
+        $event = new StateChanged($subjectId, $payload);
+        $projector = $this->instance([$event]);
+
+        $this->assertSame('bar', $projector->get('foo'));
+        $this->assertSame('baz', $projector->get('foz'));
+    }
+
+    /**
+     * @test
+     */
+    public function projection_eventWithOneProperty_returnsArrayWithOneProperty()
     {
         $events = [
             new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar'])
         ];
 
-        $actual = $this->instance($events)->toArray();
-        unset($actual['__meta']);
+        $actual = $this->instance($events)->projection();
 
         $this->assertSame(['foo' => 'bar'], $actual);
     }
@@ -58,14 +80,13 @@ class StateProjectorTest extends TestCase
     /**
      * @test
      */
-    public function toArray_eventWithTwoProperties_returnsArrayWithTwoProperties()
+    public function projection_eventWithTwoProperties_returnsArrayWithTwoProperties()
     {
         $events = [
             new StateChanged(StringSubjectId::fromString('some-id'), ['foo' => 'bar', 'bar' => 'foobar'])
         ];
 
-        $actual = $this->instance($events)->toArray();
-        unset($actual['__meta']);
+        $actual = $this->instance($events)->projection();
 
         $this->assertSame(['foo' => 'bar', 'bar' => 'foobar'], $actual);
     }
@@ -73,7 +94,7 @@ class StateProjectorTest extends TestCase
     /**
      * @test
      */
-    public function toArray_twoEvents_returnsArrayWithUpdatedProperty()
+    public function projection_twoEvents_returnsArrayWithUpdatedProperty()
     {
         $id = StringSubjectId::fromString('some-id');
         $events = [
@@ -81,8 +102,7 @@ class StateProjectorTest extends TestCase
             new StateChanged($id, ['foo' => 'baz'])
         ];
 
-        $actual = $this->instance($events)->toArray();
-        unset($actual['__meta']);
+        $actual = $this->instance($events)->projection();
 
         $this->assertSame(['foo' => 'baz'], $actual);
     }
@@ -97,13 +117,10 @@ class StateProjectorTest extends TestCase
         $this->assertInstanceOf(\Iterator::class, $actual);
     }
 
-    // TODO intermediateIterator has __meta['subject']['id']
-    // TODO intermediateIterator has __meta['subject']['class']
-
     /**
      * @test
      */
-    public function intermediateIterator_oneEventOneProperty_returnsOneArrayOneProperty()
+    public function intermediateIterator_oneEventOneProperty_returnsOneStateOneProperty()
     {
         $subjectId = StringSubjectId::fromString('some-id');
         $events = [
@@ -112,17 +129,16 @@ class StateProjectorTest extends TestCase
         ];
 
         $iterator = StateProjector::intermediateIterator(MemoryEventStream::fromArray($events));
+        $actualStates = iterator_to_array($iterator);
 
-        // FIXME: cleanup toArray
-        $actual = iterator_to_array($iterator);
-        $this->assertCount(1, $actual);
-        $this->assertSame('bar', $actual[0]->toArray()['foo']);
-        $this->assertArrayHasKey('__meta', $actual[0]->toArray());
-        $this->assertArrayHasKey('timestamp', $actual[0]->toArray()['__meta']);
-        $this->assertSame('StateChanged', $actual[0]->toArray()['__meta']['type']);
-        $this->assertSame('some-id', $actual[0]->toArray()['__meta']['subject']['id']->__toString());
-        $this->assertSame(LightSwitch::class, $actual[0]->toArray()['__meta']['subject']['type']);
+        $this->assertCount(1, $actualStates);
+        $actual = $actualStates[0];
 
+        $this->assertNotNull($actual->lastEventTimestamp());
+        $this->assertSame('bar', $actual->get('foo'));
+        $this->assertSame('StateChanged', $actual->lastEventType());
+        $this->assertSame('some-id', $actual->subjectId()->__toString());
+        $this->assertSame(LightSwitch::class, $actual->subjectType());
     }
 
     // TODO: unset properties
@@ -139,10 +155,9 @@ class StateProjectorTest extends TestCase
         ];
 
         $iterator = StateProjector::intermediateIterator(MemoryEventStream::fromArray($events));
-        $actual = iterator_to_array($iterator);
+        $actualStates = iterator_to_array($iterator);
 
-        // FIXME: cleanup toArray
-        $this->assertSame('bar', $actual[0]->toArray()['foo']);
-        $this->assertSame('baz', $actual[1]->toArray()['foo']);
+        $this->assertSame('bar', $actualStates[0]->get('foo'));
+        $this->assertSame('baz', $actualStates[1]->get('foo'));
     }
 }

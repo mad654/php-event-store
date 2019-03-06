@@ -115,27 +115,6 @@ class StateProjector implements EventStreamConsumer
         }
     }
 
-    public function toArray(): array
-    {
-        $result = $this->projection();
-        $formated = '';
-
-        if (!is_null($this->lastEventTimestamp())) {
-            $formated = $this->lastEventTimestamp()->format(DATE_ATOM);
-        }
-
-        $result['__meta'] = [
-            'timestamp' => $formated,
-            'type' => $this->lastEventType(),
-            'subject' => [
-                'id' => $this->subjectId(),
-                'type' => $this->subjectType()
-            ]
-        ];
-
-        return $result;
-    }
-
     public function lastEventTimestamp(): ?\DateTimeImmutable
     {
         return $this->lastEventTimestamp;
@@ -151,7 +130,7 @@ class StateProjector implements EventStreamConsumer
         return $this->subjectId;
     }
 
-    private function subjectType(): ?string
+    public function subjectType(): ?string
     {
         return $this->subjectType;
     }
@@ -159,5 +138,14 @@ class StateProjector implements EventStreamConsumer
     public function projection(): array
     {
         return $this->projection;
+    }
+
+    public function get(string $property, $default = null)
+    {
+        if (!array_key_exists($property, $this->projection)) {
+            return $default;
+        }
+
+        return $this->projection[$property];
     }
 }
