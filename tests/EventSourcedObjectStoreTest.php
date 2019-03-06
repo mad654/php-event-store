@@ -90,8 +90,7 @@ class EventSourcedObjectStoreTest extends FileTestCase
             $this->fail("Actual instance of TestSubject");
         }
 
-        $actualEvents = new MemoryEventStream();
-        $acutal->emitEventsTo($actualEvents);
+        $actualEvents = $this->extractEvents($acutal);
         $this->assertCount(3, iterator_to_array($actualEvents));
         $this->assertTrue($acutal->isOn());
     }
@@ -143,8 +142,7 @@ class EventSourcedObjectStoreTest extends FileTestCase
             $this->fail("Expected instance of TestSubject");
         }
 
-        $actualEvents = new MemoryEventStream();
-        $acutal->emitEventsTo($actualEvents);
+        $actualEvents = $this->extractEvents($acutal);
         $this->assertCount(3, iterator_to_array($actualEvents));
         $this->assertTrue($acutal->isOn());
     }
@@ -152,22 +150,7 @@ class EventSourcedObjectStoreTest extends FileTestCase
     /**
      * @test
      */
-    public function get_filestreamAttachedObject_isSerializeable()
-    {
-        $subjectId = StringSubjectId::fromString('initial-id');
-        $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
-        $store->attach(new LightSwitch($subjectId));
-        $fetched = $store->get($subjectId);
-
-        $serialized = serialize($fetched);
-
-        $this->assertTrue(is_string($serialized));
-    }
-
-    /**
-     * @test
-     */
-    public function get_filestreamAttachedObject_isUnserializeable()
+    public function get_filestreamAttachedObjectUnserialized_appendsNewEvents()
     {
         $subjectId = StringSubjectId::fromString('initial-id');
         $store = $this->instance(new FileEventStreamFactory($this->rootDirPath()));
@@ -186,16 +169,11 @@ class EventSourcedObjectStoreTest extends FileTestCase
             $this->fail("Expected instance of TestSubject");
         }
 
-        $expectedEvents = new MemoryEventStream();
-        $unserialized->emitEventsTo($expectedEvents);
-
-        $actualEvents = new MemoryEventStream();
-        $unserialized->emitEventsTo($actualEvents);
+        $expectedEvents = $this->extractEvents($unserialized);
+        $actualEvents = $this->extractEvents($fetchedUnserialized);
 
         $this->assertEquals($expectedEvents, $actualEvents);
     }
-
-    // todo attached object is serializeable
 
     public function instance(FileEventStreamFactory $factory = null): EventSourcedObjectStore
     {
@@ -204,6 +182,17 @@ class EventSourcedObjectStoreTest extends FileTestCase
         }
 
         return new EventSourcedObjectStore($factory);
+    }
+
+    /**
+     * @param EventSourcedObject $subject
+     * @return MemoryEventStream
+     */
+    private function extractEvents(EventSourcedObject $subject): MemoryEventStream
+    {
+        $events = new MemoryEventStream();
+        $subject->emitEventsTo($events);
+        return $events;
     }
 
 }
