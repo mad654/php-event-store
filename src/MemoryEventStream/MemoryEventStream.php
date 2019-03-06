@@ -25,7 +25,16 @@ final class MemoryEventStream implements EventStream
     public static function fromArray(array $events): self
     {
         $instance = new self();
-        $instance->data = $events;
+
+        foreach ($events as $idx => $event) {
+            if (!$event instanceof Event) {
+                throw new \RuntimeException(sprintf(
+                    'Element at index %s does not implement Event',
+                    $idx
+                ));
+            }
+            $instance->data[] = $event;
+        }
 
         return $instance;
     }

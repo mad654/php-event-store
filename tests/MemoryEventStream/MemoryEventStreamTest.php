@@ -24,7 +24,15 @@ class MemoryEventStreamTest extends TestCase
         return new MemoryEventStream();
     }
 
-    // FIXME: Add tests for fromArray asserting input types
+    /**
+     * @test
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Element at index 0 does not implement Event
+     */
+    public function fromArray_hasNonEventElements_throwsException()
+    {
+        MemoryEventStream::fromArray(['string']);
+    }
 
     /**
      * @test
