@@ -1,7 +1,12 @@
 {
     "name": "mad654/php-event-store",
     "description": "Provides classes to express object state changes as events and store them in file based eventstreams",
-    "type": "project",
+    "type": "library",
+    "keywords": [
+        "events",
+        "event sourcing"
+    ],
+    "license": "MIT",
     "authors": [
         {
             "name": "Matthias Mann",
