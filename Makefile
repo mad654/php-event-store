@@ -5,6 +5,13 @@ usage:
 
 test: test.unit test.performance
 
+test.unit.coverage:
+	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit \
+		--coverage-html ./build/log/report \
+		--coverage-clover ./build/log/coverage.xml \
+		--testdox-text ./build/log/testdox.txt \
+		--testdox-html ./build/log/testdox.html
+
 test.unit:
 	@echo "Unit tests:"
 	@vendor/bin/phpunit -c tests/phpunit.xml --testsuite unit

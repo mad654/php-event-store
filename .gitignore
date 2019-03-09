@@ -1,3 +1,4 @@
 /.idea
 /vendor
 /local_develop/.vagrant
+/build
