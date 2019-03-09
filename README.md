@@ -1,30 +1,16 @@
-# event store php implementation
+# PHP Event Store
 
-## os dependencies
+Plain php event store implementation for easy persistence by utilizing [event sourcing](https://de.wikipedia.org/wiki/Event_Sourcing).
 
-- composer in path
+It provides classes to express object state changes as events and store them in file based eventstreams.
 
-In local_develop is a prepared Vagrantfile
-which installs all needed dependencies.
+## Installation
 
-## getting started
+You can install mad654/php-event-store via composer by adding `"mad654/php-event-store": "dev-master"` as requirement to your composer.json.
 
-```bash
-cd local_develop
-vagrant up
-vagrant ssh
-```
+## By Example
 
-Inside of the vagrant box:
-
-```bash
-composer install
-make test
-```
-
-### example
-
-For a full working example take a look at `src/example`. In your vagrant box you can use it like this:
+For a full working example take a look at [`src/example`](src/example). In your vagrant box you can use it like this:
 
 ```bash
 # create storage folder
@@ -41,29 +27,9 @@ src/example/bin/console.php switch kitchen --off
 src/example/bin/console.php history kitchen
 ```
 
-## motivation
+### Step by step
 
-object relational mapping is hard, even if its well covered topic, you can only achive about 80% cases working: which?
-
-ORM needs a lot of work around ( db schema, migrations, db administration for different stages, db data migration between stages ( live -> staging -> local_develop )
-
-persistence easy like working with objects
-
-### How to solve
-
-track all state changes instead of last state, which give this opportunities (based on event sourcing):
-
-- express intention
-- more informations
-- git like merging if your objects shared over multiple systems which maybe offline some time but could change in this time
-- easy setup - just plain php and filesystem
-- just write business logic instead of db boilerplate stuff + less code
-
-think objects of your domain as process which different states, each state change is represented as a event.
-
-## usage
-
-Lets take this little example to get in touch with all the new stuff. Lets asume you want to control the light in your Kittchen and for this you have build some switch. All you need is an object which can control the state and keeps its current state over mutlitple requests:
+Let's take this little example to get in touch with all the new stuff. Lets asume you want to control the light in your Kittchen and for this you have build some switch. All you need is an object which can control the state and keeps its current state over mutlitple requests:
 
 ```php
 class LightSwitch {	
@@ -91,7 +57,7 @@ class LightSwitch {
 
 This is a good beginning, but now you need a way to persist the state.
 
-### EventSourceObject
+#### EventSourcedObject
 
 Instead of creating a database you can extend your class to implement the EventSourcedObject interface. An EventSourcedObject is simply an object which should be available in his current state in the next request and for this it can publish its events as a stream and can be build from scratch based on the events:
 
@@ -122,13 +88,13 @@ class LightSwitch implements EventSourcedObject
         return $this->state;
     }
 
-    public function switchOn()
+    public function switchOn(): void
     {
         if ($this->state) return;
         $this->record(new StateChanged($this->subjectId(), ['state' => true]));
     }
 
-    public function switchOff()
+    public function switchOff(): void
     {
         if (!$this->state) return;
         $this->record(new StateChanged($this->subjectId(), ['state' => false]));
@@ -146,8 +112,7 @@ So instead of changing your member variables directly, you will use events for t
 
 If you want to see more details, take a look at the `AutoTrackingEventSourcedObjectTrait` which should be a good starting point for all your event sourced objects and reduce boilerplate code. 
 
-
-### EventSourcedObjectStore
+#### EventSourcedObjectStore
 
 ```php
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
@@ -170,14 +135,14 @@ If '$someEventSourcedObject' was implemented correctly, it should have the equal
 
 By definition an EventSourcedObjectStore can only store and retrieve objects by id. Here you can find solutions for searching ...
 
-### Event
+#### Event
 
 In this example we use the StateChanged event, in production you should
 create subclasses of this to express more precisely what happened.
 
 In general events are immutable.
 
-### Putting all pices together
+#### Putting all together
 
 ```php
 use mad654\eventstore\FileEventStream\FileEventStreamFactory;
@@ -190,8 +155,6 @@ $switch = new LightSwitch('kitchen');
 $store->attach($switch);
 ```
 
-
-
 Some times later in an other request you want to switch on the light in the kitchen:
 
 ``` php
@@ -203,8 +166,6 @@ And again later you will switch it off again:
 ```php
 $store->get(StringSubjectId::fromString('kitchen'))->switchOff();
 ```
-
-
 
 And again ...
 
@@ -231,30 +192,19 @@ $io->table(
 # 4  | 2018-12-03 18:10:00 | StateChanged | kittchen | state    | off
 ```
 
-## concepts
+## Development
 
-### EventStream
-
-Ist eine Liste von Events.
-
-EventEmitter sind Objekte die über EventStream persistiert werden.
-
-Sobald ein EventEmitter dem ObjectEventStore mittels attach hinzugefügt
-wurde, werden alle aktuellen und alle neuen Events persistiert.
-
-Ob alle neuen Events persistiert werden, hängt von der Implementierung
-des Subjects ab.
-
-@TBD API die state changes über events super einfach macht
-
-### EventConsumer / Projector
-
-@TBD
-
-## development
-
-```
-watch make test.unit
+```bash
+cd local_develop
+vagrant up
+vagrant ssh
 ```
 
-## 
+Inside of the vagrant box:
+
+```bash
+composer install
+make test
+```
+
+### 
