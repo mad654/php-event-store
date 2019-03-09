@@ -1,27 +1,32 @@
 {
-  "config": {
-    "platform": {
-      "php": "7.3.2"
-    }
-  },
+    "name": "mad654/php-event-store",
+    "description": "Provides classes to express object state changes as events and store them in file based eventstreams",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Matthias Mann",
+            "email": "m.mann@ich-digital.de"
+        }
+    ],
     "autoload": {
-      "psr-4": {
-        "mad654\\eventstore\\": "src"
-      }
+        "psr-4": {
+            "mad654\\eventstore\\": "src"
+        }
     },
     "autoload-dev": {
-      "psr-4": {
-        "mad654\\eventstore\\": "tests"
-      }
+        "psr-4": {
+            "mad654\\eventstore\\": "tests"
+        }
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",
         "symfony/console": "^4.2"
     },
-  "require": {
-    "psr/log": "^1.1",
-    "consolidation/log": "^1.1",
-      "ext-json": "*",
-      "dflydev/dot-access-data": "^2.0"
-  }
+    "require": {
+        "ext-php": "7.2",
+        "psr/log": "^1.1",
+        "consolidation/log": "^1.1",
+        "ext-json": "*",
+        "dflydev/dot-access-data": "^2.0"
+    }
 }
